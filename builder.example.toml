@@ -1,0 +1,16 @@
+# Copy to builder.toml (ignored by git) and adjust. Relative paths are relative to this file.
+
+[xania]
+source = "../xania"              # a checkout of your fork, read by `research`
+fork = "abraidotti/xania"        # every change is gated here first
+upstream = "mattgodbolt/xania"   # never pushed to by Builder
+# The checkout Sim builds and runs, as Sim sees it (passed as `python -m xania_sim --xania PATH`).
+# Leave empty to use Sim's default.
+sim_xania = ""
+
+[explorer]
+repo = "../xania-explorer"       # imported directly when xania_explorer isn't installed
+
+[sim]
+repo = "../xania-sim"
+python = ""                      # the interpreter that runs Sim; empty = Sim's .venv if present, else this one
