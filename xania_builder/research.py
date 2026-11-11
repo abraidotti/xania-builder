@@ -241,8 +241,9 @@ def patterns_section(ix: Index, fo: Focus) -> Section:
 
 # 4. Technical debt -----------------------------------------------------------------------------------------------
 
-def _string_view_as_c_string(ix: Index, fn: Function) -> list[str]:
-    """Variables holding string_views (args.shift(), std::string_view) used like NUL-terminated C strings."""
+def string_view_hits(ix: Index, fn: Function) -> list[tuple[str, str, int]]:
+    """Variables holding string_views (args.shift(), std::string_view) indexed like NUL-terminated C strings:
+    (the expression, file, line). Indexing a view at or past its size is undefined behaviour."""
     code = ix.code(fn)
     body = ix.body(fn)
     views = set(re.findall(r"\bauto\s+(\w+)\s*=\s*\w+\.shift\(\)", code))
@@ -250,9 +251,28 @@ def _string_view_as_c_string(ix: Index, fn: Function) -> list[str]:
     out = []
     for v in sorted(views):
         for m in re.finditer(r"&?\b" + re.escape(v) + r"\[(\d+)\]", body):
-            line = fn.line + body.count("\n", 0, m.start())
-            out.append(f"`{m.group(0)}` at {fn.file}:{line}")
+            out.append((f"`{m.group(0)}`", fn.file, fn.line + body.count("\n", 0, m.start())))
+    return sorted(out, key=lambda h: h[2])
+
+
+def _string_view_as_c_string(ix: Index, fn: Function) -> list[str]:
+    return [f"{what} at {rel}:{line}" for what, rel, line in string_view_hits(ix, fn)]
+
+
+def view_declarations(ix: Index, fn: Function) -> list[tuple[str, str, int]]:
+    """Where each string_view a hit indexes was declared: (variable, file, line)."""
+    code = ix.code(fn)  # starts at fn.line
+    hits = {re.match(r"(\w+)", w.strip("`&")).group(1) for w, _, _ in string_view_hits(ix, fn)}
+    out = []
+    for v in sorted(hits):
+        m = re.search(r"\b(?:auto|std::string_view)\s+&?" + re.escape(v) + r"\b", code)
+        if m:
+            out.append((v, fn.file, fn.line + code.count("\n", 0, m.start())))
     return out
+
+
+def flagged_lines(ix: Index, fo: Focus) -> list[tuple[str, str, int]]:
+    return [h for fn in fo.functions for h in string_view_hits(ix, fn)]
 
 
 def debt_section(ix: Index, fo: Focus, world) -> Section:
@@ -277,9 +297,20 @@ def debt_section(ix: Index, fo: Focus, world) -> Section:
             s.facts.append(f"{tag} at {rel}:{line}: {msg}")
         if len(marks) > 8:
             s.facts.append(f"... and {len(marks) - 8} more TODO/FIXME marks in `{rel}`")
+    if any(string_view_hits(ix, fn) for fn in fo.functions):
+        names = {fn.name for fn in fo.functions}
+        others = [(fn, hits) for fn in ix.functions if fn.name not in names and (hits := string_view_hits(ix, fn))]
+        if others:
+            s.facts.append(f"The same pattern elsewhere in src/ ({sum(len(h) for _, h in others)} places in "
+                           f"{len(others)} functions; each is the same kind of bug unless the view is known to be "
+                           "long enough): " + "; ".join(f"`{fn.short}` " + ", ".join(f"{w} :{ln}" for w, _, ln in h)
+                                                         for fn, h in others[:10]))
+        else:
+            s.facts.append("Nowhere else in src/ indexes a string_view this way: fixing the focus clears the pattern.")
     if not s.facts:
         s.facts.append("No debt markers found in the focus.")
-    s.questions += ["What debt does the change pay down while it's here, and what does it deliberately leave?",
+    s.questions += ["Are the other places with the same pattern the same bug, and do they belong in this change?",
+                    "What debt does the change pay down while it's here, and what does it deliberately leave?",
                     "Does the change add any (a special case, a duplicated check, a new legacy idiom)?"]
     return s
 
@@ -422,13 +453,13 @@ def gate_plan(ix: Index, fo: Focus, unit: list[str], sims: dict, findings: list[
             sim.append({"command": f"pytest {path}", "why": "it sends the commands involved"})
     regressions = [f"Sim finding `{f['signature']}` should stop reproducing" + (f" ({f['link']})" if f["link"] else "")
                    for f in findings if f["status"] != "ignored"]
-    return {"builds": ["debug", "asan"], "unit_tests": sorted(set(unit)), "sim": sim, "regressions": regressions}
+    return {"builds": ["Debug (ASan, UBSan, LSan, libstdc++ assertions)", "Release (-O2)"], "unit_tests": sorted(set(unit)), "sim": sim, "regressions": regressions}
 
 
 # ---------------------------------------------------------------------------------------------------------------
 
-def build(idea: Idea, fo: Focus, ix: Index, cfg, world=None) -> Dossier:
-    commit, dirty = cfg.commit()
+def build(idea: Idea, fo: Focus, ix: Index, cfg, world=None, at: str = "") -> Dossier:
+    commit, dirty = (at, False) if at else cfg.commit()
     d = Dossier(idea, fo, commit, dirty)
     helps = helps_mod.load(ix.root)
 
@@ -450,6 +481,11 @@ def build(idea: Idea, fo: Focus, ix: Index, cfg, world=None) -> Dossier:
         tests = Section("tests", "Test coverage", note=f"Couldn't gather this section: {type(e).__name__}: {e}")
         d.gate = gate_plan(ix, fo, [], {}, [])
     d.sections.append(tests)
+    from .history import history_section
+
+    d.sections.append(guarded("history", "History",
+                              lambda: history_section(ix, fo, flagged_lines(ix, fo), cfg.upstream,
+                                                      [d for fn in fo.functions for d in view_declarations(ix, fn)])))
     return d
 
 

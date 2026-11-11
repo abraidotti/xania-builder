@@ -109,4 +109,4 @@ def checkout(tmp_path: Path) -> Path:
 def cfg(checkout: Path, tmp_path: Path):
     from xania_builder.config import Config
 
-    return Config(source=checkout, sim_repo=tmp_path / "no-sim", explorer_repo=None)
+    return Config(source=checkout, sim_repo=tmp_path / "no-sim", explorer_repo=None, upstream="")

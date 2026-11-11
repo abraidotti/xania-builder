@@ -4,6 +4,7 @@
 source = "../xania"              # a checkout of your fork, read by `research`
 fork = "abraidotti/xania"        # every change is gated here first
 upstream = "mattgodbolt/xania"   # never pushed to by Builder
+main_ref = "origin/main"         # the fork's main as the checkout sees it: a branch's default base
 # The checkout Sim builds and runs, as Sim sees it (passed as `python -m xania_sim --xania PATH`).
 # Leave empty to use Sim's default.
 sim_xania = ""
@@ -14,3 +15,8 @@ repo = "../xania-explorer"       # imported directly when xania_explorer isn't i
 [sim]
 repo = "../xania-sim"
 python = ""                      # the interpreter that runs Sim; empty = Sim's .venv if present, else this one
+
+[gate]
+# `prototype` builds and tests in Linux: on Windows, a WSL distro with g++, cmake and ninja (the same as CI).
+distro = "Ubuntu-26.04"
+repo = "$HOME/xania"             # a clone of the fork inside it; the gate's worktrees go in ~/xania-gate/<dossier>

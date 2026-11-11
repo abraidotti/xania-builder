@@ -58,6 +58,11 @@ Then it writes seven sections. Each one has **facts** it gathered and **question
 | 5. Gameplay | How players reach it, what runs it automatically, the messages it can show, whether Explorer's balance numbers depend on it |
 | 6. Documentation | Help entries for the commands and ones that mention the functions; docs in the checkout |
 | 7. Test coverage | Unit test files for the touched files (by name, include or mention), functions no test calls, Sim scenarios that send the commands, Sim findings about the functions |
+| 8. History | When each variable the faulty lines index took its current form (`git blame` on its declaration), who last changed each faulty line, the commits each function comes from, compiler and flag changes since the bug began, what Debug and Release builds turn on, and upstream issues and PRs that mention the functions |
+
+`--at REF` researches the code as it is at a commit (the base a fix will be compared with), from a cached worktree,
+so a checkout that's already on the fix branch still gets a dossier of the bug. Section 4 also sweeps all of `src/`
+for the same pattern, so a reviewer can see whether the fix leaves the same bug next door.
 
 The dossier ends with a **gate plan**: the builds, unit tests and Sim trials (`smoke` always; `hunt` when fights
 reach the code; `churn` for logins, quits and lifetimes; `skill` for a spell; scenarios that send the commands)
@@ -66,6 +71,59 @@ that `prototype` will run, and the Sim findings that should stop reproducing.
 The source index is lexical: there's no compiler involved, so calls are matched by name (an overloaded name
 counts as a call to every definition with it). Each section is gathered on its own, so one that can't run (no
 Explorer, no Sim database) says why and the rest carry on.
+
+## Analysis: the answers
+
+Research asks; someone answers. Whoever writes the change adds `analysis.md` to the dossier folder: the root cause
+(with the history), the fix and the alternatives it beat, what players will notice, an answer to every question the
+dossier asked, and what's deliberately left out. It's the part a reviewer reads first, and `ship` builds the pull
+request from it. [dossiers/issue-1-do-get-reads-past-the-end/analysis.md](dossiers/issue-1-do-get-reads-past-the-end/analysis.md)
+is the first one.
+
+## Prototype: the gate
+
+```
+python -m xania_builder prototype '#1' --branch fix/1-do-get-all
+```
+
+The gate proves the change against its base (the merge-base with the fork's main, or `base` in the dossier's
+`gate.toml`), in WSL where Xania builds, in worktrees under `~/xania-gate/<dossier>/`:
+
+| Step | What it checks |
+|---|---|
+| format | `make check-format`, as CI |
+| builds | Debug (here: ASan, UBSan, LSan, and libstdc++'s assertions, which GCC 15 turns on at -O0) and Release (-O2), as CI; `-Werror` |
+| unit tests | the whole suite on the branch in both builds (`ctest` as CI, plus Catch2's JUnit report for each case) |
+| before/after | the branch's tests applied to the **base** and run in both builds: a test that pins a bug must fail or abort there and pass on the branch; one that passes on both doesn't test the fix |
+| Sim | the trials in `gate.toml`, each with what it should find on the base (`reproduces` the finding, or a scenario that `pass`es while the bug is there) and on the branch (`clean`) |
+| static | Builder's detectors on the focus functions, base against branch |
+
+It writes `gate.json` and `gate.md` into the dossier folder. `--only` runs some steps (a quick `--only format
+static` first is a good preflight). A `gate.toml` looks like:
+
+```toml
+base = "82171fa"
+[[sim]]
+args = ["hunt", "--minutes", "5"]
+why = "autoloot runs 'get all corpse' after every kill"
+finding = "do_get"       # the finding's signature contains this
+base = "reproduces"
+branch = "clean"
+```
+
+## Ship and the website
+
+```
+python -m xania_builder ship '#1'                  # push the branch, open or update the PR on the fork
+python -m xania_builder ship '#1' --to upstream    # by hand, after review: the PR on mattgodbolt/xania
+python -m xania_builder site                       # build/site: the website, locally
+```
+
+`ship` refuses unless the gate passed at the branch's current commit. The PR description comes from the analysis
+and the gate (what was wrong, the fix, what players will notice, the verification tables) and links to the
+dossier's page on [the website](https://abraidotti.github.io/xania-builder/), which has everything: the analysis,
+the gate with its logs, and the research. GitHub Actions rebuilds the site when `dossiers/` changes on `main`.
+Gate logs are published, so home directories in them are redacted to `~`.
 
 ## Exit codes and --json
 
@@ -76,16 +134,18 @@ the summary goes to stderr.
 ## Roadmap
 
 - **B0-B1 (done)**: config, `doctor`, `research` and the dossier.
-- **B2**: `prototype`, the gate: debug and ASan builds, unit tests, the dossier's Sim trials, Explorer's comparison
-  of the base against the branch. It needs Sim's A/B commit comparison.
-- **B3**: first pilot, [abraidotti/xania#1](https://github.com/abraidotti/xania/issues/1) (`do_get` reads past the
-  end of `"all"`), end to end: research, fix on a fork branch, gate, pull request on the fork.
-- **B4**: [abraidotti/xania#2](https://github.com/abraidotti/xania/issues/2), the use-after-free on quit.
+- **B2 (done)**: `prototype`, the gate, with before/after runs of the new tests and Sim on both sides.
+- **B3 (in progress)**: the first pilots end to end: [#1](https://github.com/abraidotti/xania/issues/1) (`do_get`
+  reads past the end of `"all"`), [#3](https://github.com/abraidotti/xania/issues/3) (the lobby prompts) and
+  [#2](https://github.com/abraidotti/xania/issues/2) (the use-after-free on quit), each with research, analysis,
+  fix, gate, and a PR on the fork; then upstream, by hand.
+- **Next for the gate**: Explorer's comparison of base and branch; the string_view detector learning about
+  `empty()` guards.
 - **B5**: a feature, from an Explorer recommendation or an open upstream request.
 - **Later**: Builder's own code-level testing (unit tests, fuzzing functions directly, checking area and player
   files) and Sim's careless and abusive players against the commands a change touches.
 
-The one hard rule: every change is gated on the fork first. Nothing goes upstream from Builder.
+The one hard rule: every change is gated on the fork first. Nothing goes upstream unless a person runs `ship --to upstream` after the fork PR has been reviewed.
 
 ## Licence
 

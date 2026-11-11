@@ -110,9 +110,16 @@ def research(cfg, args) -> int:
     except idea_mod.IdeaError as e:
         _say(f"COULDN'T RUN: {e}")
         return 2
-    ix = Index(cfg.source)
+    root, at = cfg.source, ""
+    if args.at:
+        try:
+            root, at = cfg.checkout_at(args.at)
+        except RuntimeError as e:
+            _say(f"COULDN'T RUN: {e}")
+            return 2
+    ix = Index(root)
     fo = idea_mod.focus(idea, ix, args.symbol or [], args.file or [], args.command or [])
-    d = research_mod.build(idea, fo, ix, cfg, world)
+    d = research_mod.build(idea, fo, ix, cfg, world, at)
     if world_error:
         d.sections[0].note = f"Explorer couldn't load the world: {world_error}"
     folder = research_mod.write(d, Path(args.out))
@@ -129,6 +136,53 @@ def research(cfg, args) -> int:
     return code
 
 
+def prototype(cfg, args) -> int:
+    from . import gate as gate_mod
+
+    try:
+        folder = gate_mod.find_dossier(Path(args.dossiers), args.dossier)
+    except FileNotFoundError as e:
+        _say(f"COULDN'T RUN: {e}")
+        return 2
+    try:
+        g = gate_mod.run(cfg, folder, args.branch, args.base or "", set(args.only) if args.only else None, say=_say)
+    except (RuntimeError, OSError, subprocess.SubprocessError) as e:
+        _say(f"COULDN'T RUN: {e}")
+        return 2
+    for s in g.steps:
+        mark = "ok  " if s.ok else "FAIL" if s.ok is False else "    "
+        _say(f"  {mark} {s.title}: {s.detail} ({s.seconds:.0f} s)")
+    if g.error:
+        _say(f"COULDN'T RUN: {g.error}")
+    _say(f"gate {'PASSED' if g.passed else 'FAILED'} in {g.seconds / 60:.0f} min; wrote {folder / 'gate.md'}")
+    if args.json:
+        print(json.dumps(g.to_dict(), indent=1))
+    return g.exit_code()
+
+
+def site(cfg, args) -> int:
+    from . import site as site_mod
+
+    pages = site_mod.build(Path(args.dossiers), Path(args.out))
+    _say(f"site: {len(pages)} pages in {args.out}")
+    return 0
+
+
+def ship(cfg, args) -> int:
+    from . import gate as gate_mod
+    from . import ship as ship_mod
+
+    try:
+        folder = gate_mod.find_dossier(Path(args.dossiers), args.dossier)
+        r = ship_mod.ship(cfg, folder, target=args.to, draft=args.draft, dry_run=args.dry_run, say=_say)
+    except (FileNotFoundError, RuntimeError) as e:
+        _say(f"COULDN'T RUN: {e}")
+        return 2
+    if args.json:
+        print(json.dumps(r, indent=1))
+    return 0 if r.get("url") or args.dry_run else 1
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="xania_builder")
     ap.add_argument("--config", help="builder.toml to use (default ./builder.toml, then the repo's)")
@@ -141,12 +195,41 @@ def main(argv=None) -> int:
     r.add_argument("--file", action="append", help="a source file the idea is about (repeatable)")
     r.add_argument("--command", action="append", help="a player command the idea is about (repeatable)")
     r.add_argument("--out", default=str(config_mod.REPO / "dossiers"), help="where dossiers go (default dossiers/)")
+    r.add_argument("--at", help="research the code as it is at this commit or branch (e.g. the fork's main), not "
+                                "the checkout's working tree; a cached worktree is used")
     r.add_argument("--no-explorer", action="store_true", help="skip Explorer (faster; section 1 stays empty)")
     r.add_argument("--json", action="store_true")
+    p = sub.add_parser("prototype", help="the gate: format, Debug and Release builds, unit tests before and after, "
+                                         "Sim trials and detectors, base against branch")
+    p.add_argument("dossier", help="the dossier: '#1', its folder name (or a prefix), or a path")
+    p.add_argument("--branch", required=True, help="the branch with the change, in the Xania checkout")
+    p.add_argument("--base", help="what to compare against (default: gate.toml's base, else the merge-base with "
+                                  "the fork's main)")
+    p.add_argument("--only", nargs="*", help="only steps whose key starts with these (format, build, unit, "
+                                             "before-after, sim, static)")
+    p.add_argument("--dossiers", default=str(config_mod.REPO / "dossiers"))
+    p.add_argument("--json", action="store_true")
+    st = sub.add_parser("site", help="build the website of dossiers, analyses and gates (what PRs link to)")
+    st.add_argument("--dossiers", default=str(config_mod.REPO / "dossiers"))
+    st.add_argument("--out", default=str(config_mod.REPO / "build" / "site"))
+    sh = sub.add_parser("ship", help="push the gated branch and open (or update) its PR on the fork; with "
+                                     "--to upstream, on upstream (only ever by hand)")
+    sh.add_argument("dossier")
+    sh.add_argument("--to", choices=["fork", "upstream"], default="fork")
+    sh.add_argument("--draft", action="store_true")
+    sh.add_argument("--dry-run", action="store_true", help="write pr.md and say what would happen; push nothing")
+    sh.add_argument("--dossiers", default=str(config_mod.REPO / "dossiers"))
+    sh.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     cfg = config_mod.load(args.config)
     if args.cmd == "doctor":
         return doctor(cfg, args.json)
+    if args.cmd == "prototype":
+        return prototype(cfg, args)
+    if args.cmd == "site":
+        return site(cfg, args)
+    if args.cmd == "ship":
+        return ship(cfg, args)
     return research(cfg, args)
 
 

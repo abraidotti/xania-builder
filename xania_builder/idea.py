@@ -108,6 +108,10 @@ def resolve(arg: str, cfg, world_loader=None) -> Idea:
     return Idea("text", "", first[:100], arg)
 
 
+CPP_KEYWORDS = {"switch", "case", "break", "return", "default", "for", "while", "do", "if", "else", "goto",
+                "new", "delete", "auto", "const", "char", "int", "bool", "void", "true", "false", "nullptr"}
+
+
 def focus(idea: Idea, index: Index, symbols=(), files=(), commands=()) -> Focus:
     fo = Focus()
     prose, blocks = split_text(f"{idea.title}\n{idea.text}")
@@ -154,7 +158,8 @@ def focus(idea: Idea, index: Index, symbols=(), files=(), commands=()) -> Focus:
         if rel and rel not in fo.files:
             fo.files.append(rel)
             fo.why[f"file:{rel}"] = "named" if f in files else "named in the idea"
-    names = {c.name for c in index.commands if re.fullmatch(r"[a-z]{2,}", c.name)}
+    # C++ keywords in backticks are code, not commands (the command table has a "switch").
+    names = {c.name for c in index.commands if re.fullmatch(r"[a-z]{2,}", c.name)} - CPP_KEYWORDS
     wanted = list(commands)
     for m in _QUOTED.finditer(prose):
         phrase = next(g for g in m.groups() if g)

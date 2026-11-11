@@ -40,7 +40,7 @@ def test_dossier(checkout, cfg, tmp_path):
     fo = idea_mod.focus(_issue(), ix)
     d = research.build(_issue(), fo, ix, cfg, world=None)
     keys = [s.key for s in d.sections]
-    assert keys == ["explorer", "architecture", "patterns", "debt", "gameplay", "docs", "tests"]
+    assert keys == ["explorer", "architecture", "patterns", "debt", "gameplay", "docs", "tests", "history"]
     by = {s.key: s for s in d.sections}
     assert "isn't available" in by["explorer"].note
     assert any("`arg1[3]` at src/act_obj.cpp:16" in f for f in by["debt"].facts)
@@ -66,3 +66,22 @@ def test_a_failing_section_does_not_lose_the_rest(checkout, cfg, monkeypatch):
     d = research.build(_issue(), fo, ix, cfg)
     by = {s.key: s for s in d.sections}
     assert "ZeroDivisionError" in by["patterns"].note and by["debt"].facts
+
+
+def test_history_blames_flagged_lines(checkout, cfg):
+    import subprocess
+
+    def git(*a):
+        subprocess.run(["git", "-C", str(checkout), *a], check=True, capture_output=True)
+
+    git("init", "-q")
+    git("-c", "user.name=Ann", "-c", "user.email=a@example.com", "add", "-A")
+    git("-c", "user.name=Ann", "-c", "user.email=a@example.com", "commit", "-qm", "do_get takes a string_view")
+    ix = Index(checkout)
+    fo = idea_mod.focus(_issue(), ix)
+    d = research.build(_issue(), fo, ix, cfg, world=None)
+    h = {s.key: s for s in d.sections}["history"]
+    assert not h.note
+    assert any("`arg1[3]` at src/act_obj.cpp:16 was last changed in" in f and "Ann" in f and "string_view" in f
+               for f in h.facts)
+    assert any(f.startswith("`do_get`") and "1 commits" in f for f in h.facts)
