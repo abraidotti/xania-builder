@@ -41,15 +41,25 @@ One contrast that explains why only these lines are affected: `Descriptor::pop_i
 same empty line, but `next_line` is a `std::string`, and `s[s.size()]` on a `std::string` is defined (it's the
 terminator). Only `std::string_view` has no terminator to read.
 
-### A second way in, found while checking callers
+### A second way in, checked and found unreachable
 
 Not every empty reply comes from a player. On a doorman **reconnect** (`PACKET_RECONNECT`, when doorman hands
 xania back an already-authenticated connection, e.g. after xania restarts), `handle_doorman_packet` calls
-`nanny(d, "")` itself, twice (MudImpl.cpp:506 and 509). If the first call finds the character already playing on
-another connection, `check_playing` moves the descriptor to `BreakConnect`, and the second call indexes the empty
-literal there: a debug MUD would abort with no player input at all. This is from reading the code; it hasn't been
-reproduced (Sim would need to restart xania under a live doorman). The fix covers it the same way: `BreakConnect`
-gets `'\0'` and answers "Please type Y or N?".
+`nanny(d, "")` itself, twice (MudImpl.cpp:506 and 509). If the first call found the character already playing on
+another connection, `check_playing` would move the descriptor to `BreakConnect` and the second call would index the
+empty literal there.
+
+That needs doorman to hold **two authenticated channels for the same character**, and normal play can't produce
+that. Doorman marks a channel authenticated only on `PACKET_AUTHORIZED`, which xania sends in one place: a fresh
+login finishing the MOTD (MudImpl.cpp:978). A second login as the same character always meets `check_playing`
+first; answering Y closes the old channel and gets in through `check_reconnect`, which doesn't send
+`PACKET_AUTHORIZED`. So the path is effectively unreachable (short of two new characters with one name being created
+at the same moment, the race upstream #280 fixed). The fix covers it anyway: `BreakConnect` would get `'\0'` and
+answer "Please type Y or N?".
+
+The same reading confirms a separate, already-known gap: a player who gets back in through "connect anyway" or a
+link-dead reconnect is never re-authorized with doorman, so a xania restart can't reconnect them. That's upstream
+#178 (open), not this change.
 
 ## The fix
 
@@ -106,7 +116,8 @@ reused instead of a new branch.
 **4. Technical debt.** Pays down the five unguarded reads. Leaves `GetAnsi`'s `argument[0]` (line 762) as it is:
 it's guarded by the `empty()` check above it, and changing it would only be churn. (Builder's detector still lists
 it; it doesn't yet understand guards.) The same pattern elsewhere: `do_get` is #1; `do_who` and `do_permit` are
-guarded (false positives); `skill_lookup` (`practice ''`) is an unverified lead, noted in #1's analysis.
+guarded (false positives); `skill_lookup` (`practice ''`) is a real bug of the same family, confirmed with Sim and
+filed as #7.
 
 **5. Gameplay.** A player who presses Enter at one of the five prompts is asked again instead of crashing a debug
 MUD. Release builds already asked again (by accident, see above), so on the live game nothing visible changes.
@@ -123,10 +134,9 @@ should crash at every prompt) and on the branch (every prompt must be reached an
 proof comes from that.
 
 **8. History.** Answered under Root cause. Upstream: no issue about empty replies; upstream #279 (open) wants nanny broken up;
-upstream #129 (closed, "Splat in reconnect") and upstream #178 (open) are about the reconnect path, which this also hardens.
+upstream #129 (closed, "Splat in reconnect") is about the same reconnect code; upstream #178 (open) is the gap the
+reconnect reading confirmed (see above).
 
 ## Follow-ups (not in this PR)
 
-- Xania Sim: a reconnect trial (restart xania under a live doorman with a character logged in twice) to confirm the
-  second path.
 - Builder: teach the detector about `empty()` guards (it flags line 762 and two other guarded places).

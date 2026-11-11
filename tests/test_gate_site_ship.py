@@ -150,8 +150,9 @@ def test_disk_check_thresholds(monkeypatch):
     monkeypatch.setattr(disk, "workspaces", lambda cfg: [disk.Workspace("issue-1-x", 13.0, 0)])
     monkeypatch.setattr(disk, "host_free_gb", lambda path=None: 100.0)
     assert disk.check(None, "issue-1-x")[0] is True                    # reuses its workspace
-    monkeypatch.setattr(disk, "host_free_gb", lambda path=None: 30.0)
-    ok, why = disk.check(None, "issue-9-new")                          # 30 - 13 < 20: refuse
+    monkeypatch.setattr(disk, "host_free_gb", lambda path=None: 25.0)
+    ok, why = disk.check(None, "issue-9-new")                          # 25 - 7 (a new branch worktree) < 20: refuse
     assert not ok and "clean" in why
+    monkeypatch.setattr(disk, "host_free_gb", lambda path=None: 30.0)
     ok, why = disk.check(None, "issue-1-x")                            # 30 free, no new workspace: warn only
     assert ok and "Getting low" in why

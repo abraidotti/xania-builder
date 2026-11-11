@@ -110,9 +110,9 @@ after) and removes a duplicated `is_all` computation. Leaves `do_get`'s length a
 - `MudImpl::nanny` (6 places): one is guarded (`GetAnsi`); the other five are real, filed as #3, separate PR.
 - `do_who` `arg[0]`, `do_permit` `player[0]`: guarded (an `empty()` check comes first); false positives. The
   detector should learn about guards.
-- `skill_lookup` `name[0]`: **an unverified lead.** `do_practice` passes `args.shift()` after checking only
-  `args.empty()`; if `practice ''` at a trainer shifts an empty view (ArgParser strips quotes), it reads past the end.
-  Worth a Sim check and its own issue; not in this change.
+- `skill_lookup` `name[0]`: **a real bug, confirmed since and filed as #7.** `do_practice` passes `args.shift()`
+  after checking only `args.empty()`, and `practice ''` at a trainer shifts an empty view (ArgParser strips the
+  quotes), so it reads past the end. A Sim known-bug check crashes a debug MUD with it. Its own change, not this one.
 
 **5. Gameplay.** Debug builds: no more aborts on `get all` or autoloot. **Release builds (the live game): players
 will notice a change**: `get all corpse` and autoloot now leave `NODROP`/`NOREMOVE` items on NPC corpses, with
@@ -139,4 +139,4 @@ different autoloot bug, closed).
 
 - Xania Sim: retire `test_get_all_in_an_empty_room_crashes_debug_builds` once this is merged (it asks to be).
 - Builder: teach the string_view detector about `empty()` guards (2 false positives here).
-- Check the `practice ''` lead with Sim.
+- #7, `practice ''`: the same family, found by the same detector; its own PR.

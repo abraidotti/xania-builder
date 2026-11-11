@@ -1,7 +1,8 @@
 """Disk space: what the gate's workspaces take, a check before a gate runs, and ``clean``.
 
-Each dossier's gate keeps two Xania worktrees in WSL (``~/xania-gate/<dossier>/{branch,base}``), each with a Debug
-and a Release build: about 13 GB a dossier. They're kept so a rerun only rebuilds what changed (seconds, not
+Each dossier's gate keeps a worktree of its branch in WSL (``~/xania-gate/<dossier>/branch``), and every dossier on
+the same base commit shares one of the base (``~/xania-gate/_base-<commit>``), each with a Debug and a Release
+build: about 6.5 GB a dossier, plus 6.5 GB per base commit. They're kept so a rerun only rebuilds what changed (seconds, not
 minutes), but nothing needs them once a change has shipped. On Windows, WSL's disk is one virtual file on the host
 drive that grows as builds fill it and doesn't shrink by itself, so the space that matters is the **host's**.
 """
@@ -49,7 +50,7 @@ def workspaces(cfg) -> list[Workspace]:
 def check(cfg, new_slug: str = "") -> tuple[bool, str]:
     """(ok to run, a sentence about it). A new dossier's workspace needs ~13 GB on the host."""
     free = host_free_gb()
-    needs = 0 if any(w.slug == new_slug for w in workspaces(cfg)) else 13
+    needs = 0 if any(w.slug == new_slug for w in workspaces(cfg)) else 7  # its branch worktree; the base is shared
     msg = f"{free:.0f} GB free on the host" + (f"; a new gate workspace takes about {needs} GB" if needs else "")
     if free - needs < REFUSE_BELOW_GB:
         return False, msg + f". That would leave under {REFUSE_BELOW_GB} GB: run `clean` first."
@@ -64,6 +65,9 @@ def remove(cfg, slugs: list[str]) -> str:
     for s in slugs:
         if not re.fullmatch(r"[\w.-]+", s):
             raise ValueError(f"not a dossier name: {s!r}")
+        if s.startswith("_base-"):  # a shared base worktree
+            script += f'git worktree remove --force "$HOME/xania-gate/{s}" || rm -rf "$HOME/xania-gate/{s}"\n'
+            continue
         script += (f'for t in branch base; do [ -d "$HOME/xania-gate/{s}/$t" ] && '
                    f'git worktree remove --force "$HOME/xania-gate/{s}/$t" || true; done\n'
                    f'rm -rf "$HOME/xania-gate/{s}"\ngit update-ref -d refs/gate/{s} 2>/dev/null || true\n')

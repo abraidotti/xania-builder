@@ -16,6 +16,14 @@ branch = "fail"
 branch_means = "xania survives it (the known-bug check reports the bug gone and asks to be retired)"
 
 [[sim]]
+args = ["pytest", "scenarios/test_live_bugs.py", "-k", "autoloot_of_a_corpse"]
+why = "autoloot of a corpse that has something in it, every time: the director gives a beggar a small sword and a level-30 bot with autoloot on kills it"
+base = "pass"
+base_means = "xania crashes in do_get when autoloot loots the corpse (the known-bug check sees the crash)"
+branch = "fail"
+branch_means = "the bot loots the sword and xania survives (the known-bug check reports the bug gone)"
+
+[[sim]]
 args = ["hunt", "--minutes", "5"]
 why = "four level-1 bots fight angry cave beasts in Mud School with autoloot on, so every kill runs 'get all corpse'"
 finding = "do_get"

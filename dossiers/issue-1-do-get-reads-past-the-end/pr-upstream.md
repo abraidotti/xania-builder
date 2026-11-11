@@ -72,17 +72,19 @@ Run by Xania Builder's gate, in the same configurations CI uses (Debug, which he
 | | Check | Expected | Result |
 |---|---|---|---|
 | ✅ | clang-format (make check-format, as CI) | no formatting differences | clean |
-| ✅ | Debug build of the branch | it compiles (-Werror) | built in 0 s |
+| ✅ | Debug build of the branch | it compiles (-Werror) | up to date (nothing to rebuild) |
 | ✅ | Unit tests, Debug, the branch | every test passes | 1083 test cases and sections, all passed |
-| ✅ | Release build of the branch | it compiles (-Werror) | built in 0 s |
+| ✅ | Release build of the branch | it compiles (-Werror) | up to date (nothing to rebuild) |
 | ✅ | Unit tests, Release, the branch | every test passes | 1083 test cases and sections, all passed |
-| ✅ | Debug build of the base with the branch's tests | it compiles (-Werror) | built in 10 s |
-| ✅ | Release build of the base with the branch's tests | it compiles (-Werror) | built in 7 s |
+| ✅ | Debug build of the base with the branch's tests | it compiles (-Werror) | built in 99 s |
+| ✅ | Release build of the base with the branch's tests | it compiles (-Werror) | built in 109 s |
 | ✅ | The new tests, before and after the change | each new test fails or aborts on the base in at least one build, and passes on the branch | 2 of 2 new tests pin the fix |
-| ✅ | Sim `smoke` on the branch | it runs and finds no crash | no crash in 21 s |
-| ✅ | Sim `pytest scenarios/test_live_bugs.py -k get_all` on the base | xania crashes when a bot types 'get all' in an empty room (the known-bug check sees the crash) | pytest exit 0: 1 passed, 1 deselected in 38.81s |
-| ✅ | Sim `pytest scenarios/test_live_bugs.py -k get_all` on the branch | xania survives it (the known-bug check reports the bug gone and asks to be retired) | pytest exit 1: 1 failed, 1 deselected in 34.89s |
-| ✅ | Sim `hunt --minutes 5` on the branch | it runs and finds no crash | no crash in 308 s (fights 16, bot errors 0, crashed False) |
+| ✅ | Sim `smoke` on the branch | it runs and finds no crash | no crash in 22 s |
+| ✅ | Sim `pytest scenarios/test_live_bugs.py -k get_all` on the base | xania crashes when a bot types 'get all' in an empty room (the known-bug check sees the crash) | pytest exit 0: 1 passed, 3 deselected in 37.88s |
+| ✅ | Sim `pytest scenarios/test_live_bugs.py -k get_all` on the branch | xania survives it (the known-bug check reports the bug gone and asks to be retired) | pytest exit 1: 1 failed, 3 deselected in 34.71s |
+| ✅ | Sim `pytest scenarios/test_live_bugs.py -k autoloot_of_a_corpse` on the base | xania crashes in do_get when autoloot loots the corpse (the known-bug check sees the crash) | pytest exit 0: 1 passed, 3 deselected in 83.98s (0:01:23) |
+| ✅ | Sim `pytest scenarios/test_live_bugs.py -k autoloot_of_a_corpse` on the branch | the bot loots the sword and xania survives (the known-bug check reports the bug gone) | pytest exit 1: 1 failed, 3 deselected in 73.72s (0:01:13) |
+| ✅ | Sim `hunt --minutes 5` on the branch | it runs and finds no crash | no crash in 306 s (fights 16, bot errors 0, crashed False) |
 | ✅ | Builder's detectors on the focus, base against branch | no string_view indexed like a C string is left in the focus | 5 before, 0 after |
 
 The new tests on the code **before** the change (the branch's tests applied to the base) and after it:
@@ -92,7 +94,7 @@ The new tests on the code **before** the change (the branch's tests applied to t
 | get all and get all.<name> in a room | aborted | pass | pass | pass |
 | get all from an NPC corpse leaves undroppable items unless named | aborted | fail | pass | pass |
 
-<sub>g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0; cmake version 4.2.3; Ubuntu 26.04.1 LTS. Base `82171fa443`, branch `515b3001ab` (this PR's `1ee9edf4d3` has the same code, with its history squashed).</sub>
+<sub>g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0; cmake version 4.2.3; Ubuntu 26.04.1 LTS. Base `82171fa443`, branch `d87fcdd647` (this PR's `1ee9edf4d3` has the same code, with its history squashed).</sub>
 
 The same change went through the fork first, where this repo's own CI (format, Debug and Release build and test) passed: https://github.com/abraidotti/xania/pull/4.
 
@@ -100,7 +102,7 @@ The same change went through the fork first, where this repo's own CI (format, D
 
 - Xania Sim: retire `test_get_all_in_an_empty_room_crashes_debug_builds` once this is merged (it asks to be).
 - Builder: teach the string_view detector about `empty()` guards (2 false positives here).
-- Check the `practice ''` lead with Sim.
+- abraidotti/xania#7, `practice ''`: the same family, found by the same detector; its own PR.
 
 ---
 

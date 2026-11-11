@@ -166,7 +166,28 @@ def _git(root: Path, *args: str) -> str:
     return r.stdout
 
 
+def shared_base_dir(base_sha: str) -> str:
+    return f"_base-{base_sha[:12]}"
+
+
+LOCK_STALE_S = 4 * 3600  # a lock older than this is from a gate that died
+
+
 def run(cfg, folder: Path, branch: str, base: str = "", only: set[str] | None = None, say=print) -> Gate:
+    """Run the gate, one at a time: base worktrees are shared between dossiers."""
+    cfg.gate_dir.mkdir(parents=True, exist_ok=True)
+    lock = cfg.gate_dir / "gate.lock"
+    if lock.exists() and time.time() - lock.stat().st_mtime < LOCK_STALE_S:
+        raise RuntimeError(f"another gate is running ({lock.read_text(encoding='utf-8').strip()}); "
+                           f"delete {lock} if it isn't")
+    lock.write_text(f"{folder.name}, started {time.strftime('%H:%M')}", encoding="utf-8")
+    try:
+        return _run(cfg, folder, branch, base, only, say)
+    finally:
+        lock.unlink(missing_ok=True)
+
+
+def _run(cfg, folder: Path, branch: str, base: str = "", only: set[str] | None = None, say=print) -> Gate:
     plan = load_plan(folder)
     src = cfg.source
     branch_sha = _git(src, "rev-parse", f"{branch}^{{commit}}").strip()
@@ -193,17 +214,21 @@ def run(cfg, folder: Path, branch: str, base: str = "", only: set[str] | None = 
     (work / "tests.patch").write_text(diff_tests, encoding="utf-8", newline="\n")
 
     W = f"$HOME/xania-gate/{g.slug}"
+    # The base is shared by every dossier on the same base commit (one worktree and its builds, not one per
+    # dossier): each gate resets it to the base and applies its own tests, so only the test files recompile.
+    D = {"branch": f"{W}/branch", "base": f"$HOME/xania-gate/{shared_base_dir(base_sha)}"}
     R = cfg.wsl_repo
     say(f"gate {g.slug}: {branch} {branch_sha[:10]} against {base_sha[:10]}")
     prep = f"""
 set -e
-R={R}; W={W}
+R={R}; W={W}; B={D["base"]}
 git -C "$R" fetch -q {shlex.quote(wsl_path(src))} +refs/heads/{branch}:refs/gate/{g.slug}
 git -C "$R" cat-file -e {base_sha}^{{commit}} || git -C "$R" fetch -q origin
 mkdir -p "$W"
-for t in branch base; do [ -d "$W/$t" ] || git -C "$R" worktree add -q --detach "$W/$t" {base_sha}; done
+[ -d "$W/branch" ] || git -C "$R" worktree add -q --detach "$W/branch" {branch_sha}
+[ -d "$B" ] || git -C "$R" worktree add -q --detach "$B" {base_sha}
 cd "$W/branch" && git checkout -q -f --detach {branch_sha} && git clean -qfd src
-cd "$W/base" && git checkout -q -f --detach {base_sha} && git clean -qfd src
+cd "$B" && git checkout -q -f --detach {base_sha} && git clean -qfd src
 git apply {shlex.quote(wsl_path(work / 'tests.patch'))} 2>&1 || {{ echo "tests.patch doesn't apply to the base"; exit 3; }}
 echo "gcc: $(g++-15 --version 2>/dev/null | head -1 || g++ --version | head -1)"
 echo "cmake: $(cmake --version | head -1)"
@@ -240,7 +265,7 @@ echo "user: $(whoami)"
 
     # 1. Format
     s = step("format", "clang-format (make check-format, as CI)", "no formatting differences",
-             f'cd {W}/branch && make check-format 2>&1')
+             f'cd {D["branch"]} && make check-format 2>&1')
     if s:
         s.detail = "clean" if s.ok else "formatting differs: run `make reformat-code`"
 
@@ -251,7 +276,7 @@ echo "user: $(whoami)"
             lc = mode.lower()
             label = "the branch" if where == "branch" else "the base with the branch's tests"
             b = step(f"build.{where}.{lc}", f"{mode} build of {label}", "it compiles (-Werror)",
-                     f"cd {W}/{where} && make build BUILD_TYPE={mode} 2>&1"
+                     f"cd {D[where]} && make build BUILD_TYPE={mode} 2>&1"
                      + (f" && make install BUILD_TYPE={mode} > /dev/null 2>&1" if mode == "Debug" else ""))
             if b and not b.ok:
                 if (where == "base" and "error:" in b.log and "src/test/" in b.log
@@ -270,7 +295,7 @@ echo "user: $(whoami)"
             xml = f"/tmp/xania-gate-{g.slug}-{where}-{lc}.xml"
             u = step(f"unit.{where}.{lc}", f"Unit tests, {mode}, {label}",
                      "every test passes" if where == "branch" else "the new tests fail here (they pin the bug)",
-                     f"cd {W}/{where}/cmake-build-{lc} && rm -f {xml}; "
+                     f"cd {D[where]}/cmake-build-{lc} && rm -f {xml}; "
                      + ("ctest --output-on-failure > /tmp/ctest.log 2>&1; c=$?; tail -5 /tmp/ctest.log; "
                         if where == "branch" else "c=0; ")
                      + f"./src/test/xania_test -r junit -o {xml} > /tmp/catch.log 2>&1; x=$?; "
@@ -300,7 +325,7 @@ echo "user: $(whoami)"
     if any(s.data.get("needs_change") for s in g.steps) and plan.get("sim"):
         b = step("build.base-for-sim", "Debug build of the base as it is (for Sim's trials on it)",
                  "it compiles and installs",
-                 f"cd {W}/base && git checkout -q -f --detach {base_sha} && git clean -qfd src && "
+                 f"cd {D['base']} && git checkout -q -f --detach {base_sha} && git clean -qfd src && "
                  "make build BUILD_TYPE=Debug 2>&1 && make install BUILD_TYPE=Debug > /dev/null 2>&1")
         if b:
             b.detail = f"built in {b.seconds:.0f} s" if b.ok else "build failed"
@@ -344,7 +369,7 @@ echo "user: $(whoami)"
             expect = trial.get(where, "")
             if not expect or expect == "skip" or not want(f"sim.{n}.{where}"):
                 continue
-            st = _sim(cfg, trial, where, expect, f"{W}/{where}", n, say)
+            st = _sim(cfg, trial, where, expect, D[where], n, say)
             say(f"    -> {'ok' if st.ok else 'FAIL'}: {st.detail.splitlines()[0] if st.detail else ''}")
             g.steps.append(st)
 
