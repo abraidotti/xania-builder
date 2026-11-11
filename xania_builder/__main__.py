@@ -144,6 +144,16 @@ def prototype(cfg, args) -> int:
     except FileNotFoundError as e:
         _say(f"COULDN'T RUN: {e}")
         return 2
+    from . import disk
+
+    try:
+        ok, why = disk.check(cfg, folder.name)
+    except (OSError, RuntimeError, subprocess.SubprocessError) as e:
+        ok, why = True, f"couldn't check disk space ({e})"
+    _say(f"disk: {why}")
+    if not ok and not args.ignore_disk:
+        _say("COULDN'T RUN: not enough disk space (see `clean --list`, or pass --ignore-disk)")
+        return 2
     try:
         g = gate_mod.run(cfg, folder, args.branch, args.base or "", set(args.only) if args.only else None, say=_say)
     except (RuntimeError, OSError, subprocess.SubprocessError) as e:
@@ -158,6 +168,38 @@ def prototype(cfg, args) -> int:
     if args.json:
         print(json.dumps(g.to_dict(), indent=1))
     return g.exit_code()
+
+
+def clean(cfg, args) -> int:
+    from . import disk
+
+    ws = disk.workspaces(cfg)
+    total = sum(w.gb for w in ws)
+    if args.list or not (args.dossier or args.keep is not None):
+        for w in ws:
+            _say(f"  {w.gb:6.1f} GB  {w.slug}")
+        _say(f"gate workspaces: {total:.1f} GB in {len(ws)}; host: {disk.host_free_gb():.0f} GB free")
+        return 0
+    if args.keep is not None:
+        targets = [w.slug for w in ws[args.keep:]]  # newest first: keep the first N
+    else:
+        known = {w.slug for w in ws}
+        targets = [w.slug for w in ws if any(w.slug == d or w.slug.startswith(f"issue-{d.lstrip('#')}-")
+                                              for d in args.dossier)]
+        missing = [d for d in args.dossier if not any(t == d or t.startswith(f"issue-{d.lstrip('#')}-")
+                                                      for t in known)]
+        for d in missing:
+            _say(f"  no gate workspace for {d}")
+    if not targets:
+        _say("nothing to clean")
+        return 0
+    freed = sum(w.gb for w in ws if w.slug in targets)
+    disk.remove(cfg, targets)
+    for t in targets:
+        _say(f"  removed {t}")
+    _say(f"freed about {freed:.1f} GB inside WSL (on Windows the virtual disk only shrinks if it's sparse or "
+         "compacted; see the README)")
+    return 0
 
 
 def site(cfg, args) -> int:
@@ -208,7 +250,12 @@ def main(argv=None) -> int:
     p.add_argument("--only", nargs="*", help="only steps whose key starts with these (format, build, unit, "
                                              "before-after, sim, static)")
     p.add_argument("--dossiers", default=str(config_mod.REPO / "dossiers"))
+    p.add_argument("--ignore-disk", action="store_true", help="run even if the host is short of disk space")
     p.add_argument("--json", action="store_true")
+    c = sub.add_parser("clean", help="list or remove the gate's workspaces in WSL (~13 GB a dossier)")
+    c.add_argument("dossier", nargs="*", help="remove these dossiers' workspaces ('#1', or a folder name)")
+    c.add_argument("--keep", type=int, help="remove all but the N most recently used workspaces")
+    c.add_argument("--list", action="store_true", help="only list them, with sizes (the default with no arguments)")
     st = sub.add_parser("site", help="build the website of dossiers, analyses and gates (what PRs link to)")
     st.add_argument("--dossiers", default=str(config_mod.REPO / "dossiers"))
     st.add_argument("--out", default=str(config_mod.REPO / "build" / "site"))
@@ -228,6 +275,8 @@ def main(argv=None) -> int:
         return prototype(cfg, args)
     if args.cmd == "site":
         return site(cfg, args)
+    if args.cmd == "clean":
+        return clean(cfg, args)
     if args.cmd == "ship":
         return ship(cfg, args)
     return research(cfg, args)

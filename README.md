@@ -111,6 +111,22 @@ base = "reproduces"
 branch = "clean"
 ```
 
+### Disk space
+
+Each dossier's gate keeps two worktrees in WSL, each with a Debug and a Release build: about **13 GB a dossier**.
+They stay so a rerun only rebuilds what changed. Before a gate starts, `prototype` checks the free space where WSL's
+disk lives (on Windows, the host drive) and refuses with under 20 GB left after a new workspace, warning under 40.
+
+```
+python -m xania_builder clean              # list workspaces and their sizes
+python -m xania_builder clean '#1' '#3'    # remove those dossiers' workspaces (the dossiers stay)
+python -m xania_builder clean --keep 2     # keep only the two most recently used
+```
+
+On Windows, WSL's disk is one virtual file (`ext4.vhdx`) that grows as builds fill it and doesn't give space back
+to Windows by itself. Make it sparse once (`wsl --shutdown`, then `wsl --manage <distro> --set-sparse true`) and
+space freed in WSL returns to Windows automatically.
+
 ## Ship and the website
 
 ```

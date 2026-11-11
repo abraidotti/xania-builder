@@ -142,3 +142,16 @@ def test_redact_paths_and_user_names(monkeypatch):
     out = gate.redact(r"NO_BUILD /home/zorblat/x and C:\Users\Zorblat\y and /tmp/.xania-9100-zorblat.")
     assert "orblat" not in out.lower()
     assert out == r"NO_BUILD ~/x and ~\y and /tmp/.xania-9100-user."
+
+
+def test_disk_check_thresholds(monkeypatch):
+    from xania_builder import disk
+
+    monkeypatch.setattr(disk, "workspaces", lambda cfg: [disk.Workspace("issue-1-x", 13.0, 0)])
+    monkeypatch.setattr(disk, "host_free_gb", lambda path=None: 100.0)
+    assert disk.check(None, "issue-1-x")[0] is True                    # reuses its workspace
+    monkeypatch.setattr(disk, "host_free_gb", lambda path=None: 30.0)
+    ok, why = disk.check(None, "issue-9-new")                          # 30 - 13 < 20: refuse
+    assert not ok and "clean" in why
+    ok, why = disk.check(None, "issue-1-x")                            # 30 free, no new workspace: warn only
+    assert ok and "Getting low" in why
