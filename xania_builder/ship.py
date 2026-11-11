@@ -18,6 +18,50 @@ from .site import PAGES_URL
 ATTRIBUTION = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
 
 
+def _outside_code(md: str, fn) -> str:
+    """Apply fn to the parts of md that aren't fenced code blocks or `inline code`."""
+    out = []
+    for i, block in enumerate(re.split(r"(^```.*?^```[^\n]*$)", md, flags=re.M | re.S)):
+        if i % 2:
+            out.append(block)
+            continue
+        out.append("".join(p if j % 2 else fn(p) for j, p in enumerate(re.split(r"(`[^`\n]+`)", block))))
+    return "".join(out)
+
+
+def retarget(md: str, target: str, fork: str, upstream: str) -> str:
+    """Issue references, written in analyses as ``#N`` (the fork's) and ``upstream #N``, made right for the repo
+    the PR goes to: on the fork, upstream's become ``owner/repo#N``; on upstream, the fork's do."""
+    def fix(text: str) -> str:
+        text = re.sub(r"\bupstream #(\d+)", lambda m: f"\x00{m.group(1)}\x00", text)
+        if target == "upstream":
+            text = re.sub(r"(?<![\w/#\[])#(\d+)\b", lambda m: f"{fork}#{m.group(1)}", text)
+            return re.sub(r"\x00(\d+)\x00", r"#\1", text)
+        return re.sub(r"\x00(\d+)\x00", lambda m: f"{upstream}#{m.group(1)}", text)
+
+    return _outside_code(md, fix)
+
+
+def unwrap(md: str) -> str:
+    """Join hard-wrapped lines: GitHub shows every newline in a PR description as a line break. Code blocks,
+    tables, headings and HTML stay as they are; a list item's continuation lines join the item."""
+    out: list[str] = []
+    fence = False
+    for ln in md.split("\n"):
+        if ln.startswith("```"):
+            fence = not fence
+            out.append(ln)
+            continue
+        plain = ln.strip() and not re.match(r"^(\s*[-*] |\s*\d+\. |#|\||<|>|```)", ln)
+        prev = out[-1] if out else ""
+        joinable = prev.strip() and not re.match(r"^(#|\||<|```)", prev) and not prev.rstrip().endswith("</details>")
+        if not fence and plain and joinable and out:
+            out[-1] = prev.rstrip() + " " + ln.strip()
+        else:
+            out.append(ln)
+    return "\n".join(out)
+
+
 def sections(md: str) -> dict[str, str]:
     """{heading: body} for each ## and ### heading."""
     out: dict[str, str] = {}
@@ -40,7 +84,7 @@ def _mark(ok) -> str:
     return "✅" if ok else "❌" if ok is False else "➖"
 
 
-def gate_tables(g: dict) -> str:
+def gate_tables(g: dict, head: str = "") -> str:
     out = ["| | Check | Expected | Result |", "|---|---|---|---|"]
     for s in g["steps"]:
         if s["key"].startswith("unit.base"):
@@ -58,11 +102,14 @@ def gate_tables(g: dict) -> str:
     env = g.get("environment", {})
     if env:
         out += ["", f"<sub>{env.get('gcc', '')}; {env.get('cmake', '')}; {env.get('os', '')}. Base "
-                    f"`{g['base_sha'][:10]}`, branch `{g['branch_sha'][:10]}`.</sub>"]
+                    f"`{g['base_sha'][:10]}`, branch `{g['branch_sha'][:10]}`"
+                    + (f" (this PR's `{head[:10]}` has the same code, with its history squashed)"
+                       if head and head != g['branch_sha'] else "") + ".</sub>"]
     return "\n".join(out)
 
 
-def body(folder: Path, g: dict, target: str, issue_ref: str, fork: str) -> str:
+def body(folder: Path, g: dict, target: str, issue_ref: str, fork: str, upstream: str = "mattgodbolt/xania",
+         head: str = "") -> str:
     a = (folder / "analysis.md").read_text(encoding="utf-8")
     sec = sections(a)
     lead = a.split("## In one paragraph", 1)[1].split("\n## ", 1)[0].strip() if "## In one paragraph" in a else ""
@@ -88,7 +135,7 @@ def body(folder: Path, g: dict, target: str, issue_ref: str, fork: str) -> str:
         parts += ["", "## What players will notice", "", gameplay.group(1).strip()]
     parts += ["", "## Verification", "",
               "Run by Xania Builder's gate, in the same configurations CI uses (Debug, which here means "
-              "ASan + UBSan + libstdc++ assertions, and Release -O2):", "", gate_tables(g)]
+              "ASan + UBSan + libstdc++ assertions, and Release -O2):", "", gate_tables(g, head)]
     if follow:
         parts += ["", "## Not in this PR", "", follow]
     parts += ["", "---", "",
@@ -96,7 +143,7 @@ def body(folder: Path, g: dict, target: str, issue_ref: str, fork: str) -> str:
               f"research asked and its answer, and the gate's logs. Researched and gated with "
               f"[Xania Builder](https://github.com/abraidotti/xania-builder); players simulated with "
               f"[Xania Sim](https://github.com/abraidotti/xania-sim).", "", ATTRIBUTION, ""]
-    return "\n".join(parts)
+    return unwrap(retarget("\n".join(parts), target, fork, upstream))
 
 
 def _run(cmd: list[str], cwd: Path | None = None) -> str:
@@ -114,15 +161,20 @@ def ship(cfg, folder: Path, target: str = "fork", draft: bool = False, dry_run: 
     if not g.get("passed"):
         raise RuntimeError(f"the gate for {folder.name} didn't pass; see {folder / 'gate.md'}")
     head = _run(["git", "-C", str(cfg.source), "rev-parse", g["branch"]])
-    if head != g["branch_sha"]:
-        raise RuntimeError(f"{g['branch']} is at {head[:10]} but the gate ran on {g['branch_sha'][:10]}: rerun it")
+    # The gate proves code, not history: a branch squashed or reworded after the gate is still the code it gated,
+    # as long as the tree (every file's content) is the same.
+    tree = lambda ref: _run(["git", "-C", str(cfg.source), "rev-parse", f"{ref}^{{tree}}"])  # noqa: E731
+    if head != g["branch_sha"] and tree(head) != tree(g["branch_sha"]):
+        raise RuntimeError(f"{g['branch']} is at {head[:10]}, whose code differs from what the gate ran on "
+                           f"({g['branch_sha'][:10]}): rerun it")
     if not (folder / "analysis.md").exists():
         raise RuntimeError(f"no analysis.md in {folder}: write it (it answers the dossier's questions)")
     d = json.loads((folder / "dossier.json").read_text(encoding="utf-8"))
     plan = tomllib.loads((folder / "gate.toml").read_text(encoding="utf-8")) if (folder / "gate.toml").exists() else {}
-    title = plan.get("title") or _run(["git", "-C", str(cfg.source), "log", "-1", "--format=%s",
-                                        g["branch_sha"]])
-    text = body(folder, g, target, d["idea"].get("ref", ""), cfg.fork)
+    # The branch's first commit says what the change is; later ones are usually follow-ups.
+    title = plan.get("title") or _run(["git", "-C", str(cfg.source), "log", "--reverse", "--format=%s",
+                                        f"{g['base_sha']}..{head}"]).splitlines()[0]
+    text = body(folder, g, target, d["idea"].get("ref", ""), cfg.fork, cfg.upstream, head)
     (folder / ("pr.md" if target == "fork" else "pr-upstream.md")).write_text(text, encoding="utf-8")
     result = {"title": title, "target": target, "body": str(folder / "pr.md")}
     if dry_run:

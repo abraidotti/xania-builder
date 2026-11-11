@@ -19,6 +19,7 @@ def test_parse_junit_and_case_status():
     assert gate.case_status(r, "other", aborted=False) == "pass"
     assert gate.case_status({}, "get all", aborted=True) == "aborted"
     assert gate.case_status(gate.parse_junit("<testsuites><testsuite>"), "x", aborted=False) == "missing"
+    assert gate.parse_junit("\n" + JUNIT) == r  # as it comes out of the shell, after a marker line
 
 
 def test_new_test_cases_from_a_diff():
@@ -112,3 +113,32 @@ def test_site_build(tmp_path):
     page = (tmp_path / "out" / "dossiers" / "issue-1-x" / "index.html").read_text(encoding="utf-8")
     assert len(pages) == 2 and "not gated yet" in page and 'id="analysis"' in page
     assert "do_get reads past the end" in (tmp_path / "out" / "index.html").read_text(encoding="utf-8")
+
+
+def test_markdown_bold_around_code():
+    assert site._inline("**Skip `ch` here** and *`x`*") == \
+        "<strong>Skip <code>ch</code> here</strong> and <em><code>x</code></em>"
+    assert site._inline("`a*b*c` and `<p>`") == "<code>a*b*c</code> and <code>&lt;p&gt;</code>"
+
+
+def test_retarget_issue_references():
+    md = "Fixes #1; see upstream #279 and `arr#3`.\n```\n#2 in code\n```\nabraidotti/xania#4"
+    fork = ship.retarget(md, "fork", "abraidotti/xania", "mattgodbolt/xania")
+    assert "Fixes #1; see mattgodbolt/xania#279 and `arr#3`." in fork and "#2 in code" in fork
+    up = ship.retarget(md, "upstream", "abraidotti/xania", "mattgodbolt/xania")
+    assert "Fixes abraidotti/xania#1; see #279" in up and "\n#2 in code\n" in up and up.endswith("abraidotti/xania#4")
+
+
+def test_unwrap_joins_paragraphs_only():
+    md = ("One line\nwraps here.\n\n- item\n  continues\n- two\n\n| a |\n|---|\n\n```\nx\ny\n```\n"
+          "<details><summary>s</summary>\n\nbody\nmore\n\n</details>\n## Head\ntext")
+    out = ship.unwrap(md)
+    assert "One line wraps here." in out and "- item continues" in out and "- two" in out
+    assert "```\nx\ny\n```" in out and "| a |\n|---|" in out and "body more" in out and "## Head\ntext" in out
+
+
+def test_redact_paths_and_user_names(monkeypatch):
+    monkeypatch.setattr(gate, "PRIVATE_NAMES", {"Zorblat"})
+    out = gate.redact(r"NO_BUILD /home/zorblat/x and C:\Users\Zorblat\y and /tmp/.xania-9100-zorblat.")
+    assert "orblat" not in out.lower()
+    assert out == r"NO_BUILD ~/x and ~\y and /tmp/.xania-9100-user."

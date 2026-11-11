@@ -1,0 +1,17 @@
+# What `prototype` runs for #3, beyond format, builds and unit tests (always run).
+# nanny is private to MudImpl, so the before/after proof is Sim's: a careless player pressing Enter at each prompt.
+base = "82171fa"   # main of the fork and of upstream when the issue was filed
+
+[[sim]]
+args = ["smoke"]
+why = "the game still boots and a player can create a character (through every lobby prompt), look and quit"
+branch = "clean"
+
+[[sim]]
+args = ["lobby"]
+why = "a careless player presses Enter at each of the five prompts: BreakConnect, ConfirmNewName, GetNewSex, GetAlignment, DefaultChoice"
+finding = "nanny"
+base = "reproduces"
+branch = "clean"
+timeout = 1200
+outcomes = "all-ok"   # every prompt reached and survived, not just "no crash"

@@ -1,0 +1,325 @@
+{
+ "schema": 1,
+ "slug": "issue-3-nanny-reads-argument-0-of-an",
+ "branch": "fix/3-lobby-empty-reply",
+ "branch_sha": "f7a0c3b52d2c174239b844c83888be47fc79bb01",
+ "base_sha": "82171fa4434933217c5995dc45ae730c4c635928",
+ "started": 1794414149.088403,
+ "seconds": 205.8,
+ "environment": {
+  "gcc": "g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "os": "Ubuntu 26.04.1 LTS",
+  "distro": "Ubuntu-26.04"
+ },
+ "changes": {
+  "files": [
+   [
+    "M",
+    "src/MudImpl.cpp"
+   ],
+   [
+    "M",
+    "src/string_utils.hpp"
+   ],
+   [
+    "M",
+    "src/test/string_utils_test.cpp"
+   ]
+  ],
+  "stat": "3 files changed, 23 insertions(+), 5 deletions(-)",
+  "commits": [
+   "f7a0c3b nanny: an empty reply at a Y/N-style lobby prompt asks again instead of reading past the end (#3)"
+  ],
+  "new_tests": [
+   "first_char"
+  ]
+ },
+ "steps": [
+  {
+   "key": "format",
+   "title": "clang-format (make check-format, as CI)",
+   "ok": true,
+   "expected": "no formatting differences",
+   "detail": "clean",
+   "seconds": 1.9,
+   "log": "~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/.tools/clang-format-14 --dry-run -Werror ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Class.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AreaList.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/entity_balance.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ScrollTargetValidator.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/TimeInfoData.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/update.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Learning.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/WrappedFd.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PracticeTabulator.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Char.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Pronouns.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/VnumMobiles.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Shop.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Types.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_obj.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ObjectIndex.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/magic.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProgLoader.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AFFECT_DATA.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/channels.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SkillTables.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Constants.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DescriptorFilter.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/fight.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Help.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ScrollTargetValidator.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DamageMessages.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ObjectType.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Stats.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Finger.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PcCustomization.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SkillsTabulator.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PerEnum.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Stats.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CommandSet.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SectorType.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/string_utils.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Weapon.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/merc.h ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Socials.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Alignment.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/InterpreterImpl.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CharActFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/spec_concordius.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AreaList.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Titles.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/magic2.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/Fd.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/mask_hostname.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/Time.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/Fd.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/BitOps.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/StandardBits.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/Configuration.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/Byte.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/test/ConfigurationTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/test/TimeTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/test/mask_hostname_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/test/main.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/mask_hostname.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/doorman_protocol.h ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/common/Configuration.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Dice.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Visitor.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/handler.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProgImpl.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Channel.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Doorman.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Channel.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/TelnetProtocol.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/test/TelnetProtocolTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/test/IdAllocatorTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/test/main.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Logger.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Doorman.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/TelnetProtocol.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Xania.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Logger.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/Xania.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/IdAllocator.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/IdAllocator.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/doorman/main.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ClanCommFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/clan.h ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Attacks.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Learning.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/lookup.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ArgParser.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/update.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ObjectType.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Worn.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PlayerActFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Finger.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Weapon.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Rng.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/RoomFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/phil.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MobTrig.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/BodyPartFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ResetData.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Direction.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MudImpl.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DamageMessages.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AffectList.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Pronouns.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/InjuredPart.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Note.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MobIndexData.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_move.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/FlagFormat.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_info.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Char.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_info.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/skills.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ExitFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_comm.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Ban.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProg.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Ban.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ride.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/TimeInfoData.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DamageContext.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/db.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AffectList.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Object.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProg.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MobIndexData.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CorpseSummoner.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AFFECT_DATA.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/save.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/BodySize.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Lights.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/skills.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Sex.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/save.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DescriptorList.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Materials.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Duel.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Flag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Area.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PromptFormat.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PromptFormat.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ride.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MudImpl.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SpellTarget.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Sex.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/BodySize.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CorpseSummoner.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/VnumObjects.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Position.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/string_utils_impl.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ArmourClass.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Races.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Class.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Descriptor.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PcNutrition.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MorphologyFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ArgParser.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Descriptor.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/apps/map.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/apps/pfu.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/apps/pfu.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/apps/areas.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/apps/test/pfutest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/apps/test/main.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/apps/pfumain.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/wiznet.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SkillTables.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AffectLocation.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Room.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Act.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Logging.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Direction.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Note.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProgTriggerCtx.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/act_obj_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/CharTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/PracticeTabulatorTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/MProgImplTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/PromptFormatTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/fileutils.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/BodySizeTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/TitlesTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/HelpTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/magic_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/WeaponTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/DescriptorTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/PositionTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/DuelTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/ScrollTargetValidatorTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/LoggingTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/FlagTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/SkillsTabulatorTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/CatchFormatters.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/ClassTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/db_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/ObjectTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/AffectListTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/AreaTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/MemFile.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/WearTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/BansTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/TimeInfoDataTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/PronounsTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/HitChanceTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/AFFECT_DATATest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/MockMud.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/DamageMessagesTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/LearningTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/AttacksTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/SectorTypeTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/MaterialsTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/InjuredPartTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/lookup_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/DamageToleranceTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/CommandSetTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/PcNutritionTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/nth_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/MProgLoaderTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/InterpreterImplTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/save_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/DiceTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/MobIndexDataTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/string_utils_test.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/SexTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/MockRng.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/WeatherDataTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/NoteTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/ObjectTypeTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/CorpseSummonerTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/SocialsTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/ArgParserTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/TipsTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/main.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/test/GenericListTest.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ObjectIndex.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ObjectExtraFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ObjectIndexValidator.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/mob_commands.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Tips.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/VnumRooms.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SkillsTabulator.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Races.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/OffensiveFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SkillNumbers.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PracticeTabulator.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Materials.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/HitChance.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/nth.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Logging.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/AffectFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/fight.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Position.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/WeatherData.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Flag.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ExtraDescription.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/clan.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/HitChance.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CommFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Interpreter.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/db.h ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PcData.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/InjuredPart.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Columner.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Attacks.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Tip.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/InterpreterImpl.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/nth.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Dice.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Object.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ContainerFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/WeatherData.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Rng.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_obj.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/PcNutrition.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/string_utils.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Titles.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/healer.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DamageType.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Mud.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DamageTolerance.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_comm.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProgProgram.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_wiz.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DescriptorList.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Socials.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Tips.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_move.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProgImpl.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Format.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/lookup.h ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Tip.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Room.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/special.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProgTypeFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Exit.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Target.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CharExtraFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CharVersion.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/MProgLoader.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Act.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/magic.h ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/SectorType.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/GenericList.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Area.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/handler.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/WeaponFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/act_wiz.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/main.cpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ObjectWearFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Help.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/DamageTolerance.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/Duel.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/WrappedFd.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/ToleranceFlag.hpp ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/src/CharFileMeta.hpp",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "build.branch.debug",
+   "title": "Debug build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 0.4,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/cmake-build-debug\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.debug",
+   "title": "Unit tests, Debug, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1075 test cases and sections, all passed",
+   "seconds": 3.6,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.20 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   2.09 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1075,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.branch.release",
+   "title": "Release build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 0.2,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/branch/cmake-build-release\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.release",
+   "title": "Unit tests, Release, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1075 test cases and sections, all passed",
+   "seconds": 0.3,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.02 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   0.13 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1075,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.debug",
+   "title": "Debug build of the base with the branch's tests",
+   "ok": null,
+   "expected": "it compiles (-Werror)",
+   "detail": "the new tests use code the change adds, so they can't compile without it; Sim's trials on the base are the before/after proof",
+   "seconds": 1.7,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/cmake-build-debug\nFAILED: [code=1] src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o \n/usr/bin/g++-15 -DCATCH_CONFIG_ENABLE_ALL_STRINGMAKERS -DCATCH_CONFIG_EXTERNAL_INTERFACES -DCURL_STATICLIB=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DTEST_DATA_DIR=\\\"~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/test_data\\\" -I~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/common/.. -isystem ~/.conan2/p/ms-gs0dca0ad769720/p/include -isystem ~/.conan2/p/b/dateb908529e1afd1/p/include -isystem ~/.conan2/p/b/fmtb0dcc6566c971/p/include -isystem ~/.conan2/p/range0301bf3d76d5d/p/include -isystem ~/.conan2/p/b/spdlo4ad83b33f87a9/p/include -isystem ~/.conan2/p/magic063a607ca5409/p/include -isystem ~/.conan2/p/b/catch6033a2d777cd4/p/include -isystem ~/.conan2/p/tromp61e1d5cd3f939/p/include -g -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined  -std=gnu++20 -Werror -Wall -Wextra -g -MD -MT src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o -MF src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o.d -fmodules-ts -fmodule-mapper=src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o -c ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp\nIn file included from ~/.conan2/p/b/catch6033a2d777cd4/p/include/catch2/catch_tostring.hpp:17,\n                 from ~/.conan2/p/b/catch6033a2d777cd4/p/include/catch2/internal/catch_decomposer.hpp:11,\n                 from ~/.conan2/p/b/catch6033a2d777cd4/p/include/catch2/internal/catch_assertion_handler.hpp:12,\n                 from ~/.conan2/p/b/catch6033a2d777cd4/p/include/catch2/internal/catch_test_macro_impl.hpp:12,\n                 from ~/.conan2/p/b/catch6033a2d777cd4/p/include/catch2/catch_test_macros.hpp:11,\n                 from ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:3:\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp: In function \u2018void CATCH2_INTERNAL_TEST_133()\u2019:\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:431:15: error: \u2018first_char\u2019 was not declared in this scope\n  431 |         CHECK(first_char(\"yes\") == 'y');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:431:15: error: \u2018first_char\u2019 was not declared in this scope\n  431 |         CHECK(first_char(\"yes\") == 'y');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:435:83: error: \u2018first_char\u2019 was not declared in this scope\n  435 |     SECTION(\"an empty reply gives '\\\\0' instead of reading past the end\") { CHECK(first_char(\"\") == '\\0'); }\n      |                                                                                   ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:435:83: error: \u2018first_char\u2019 was not declared in this scope\n  435 |     SECTION(\"an empty reply gives '\\\\0' instead of reading past the end\") { CHECK(first_char(\"\") == '\\0'); }\n      |                                                                                   ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:438:15: error: \u2018first_char\u2019 was not declared in this scope\n  438 |         CHECK(first_char(line.substr(3)) == '\\0');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:438:15: error: \u2018first_char\u2019 was not declared in this scope\n  438 |         CHECK(first_char(line.substr(3)) == '\\0');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:440:19: error: \u2018first_char\u2019 was not declared in this scope\n  440 |     static_assert(first_char(\"\") == '\\0' && first_char(\"g\") == 'g');\n      |                   ^~~~~~~~~~\nninja: build stopped: subcommand failed.\nmake: *** [Makefile:46: build] Error 1",
+   "data": {
+    "exit": 2,
+    "needs_change": true
+   }
+  },
+  {
+   "key": "build.base.release",
+   "title": "Release build of the base with the branch's tests",
+   "ok": null,
+   "expected": "it compiles (-Werror)",
+   "detail": "the new tests use code the change adds, so they can't compile without it; Sim's trials on the base are the before/after proof",
+   "seconds": 1.5,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/cmake-build-release\nFAILED: [code=1] src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o \n/usr/bin/g++-15 -DCATCH_CONFIG_ENABLE_ALL_STRINGMAKERS -DCATCH_CONFIG_EXTERNAL_INTERFACES -DCURL_STATICLIB=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DTEST_DATA_DIR=\\\"~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/test_data\\\" -I~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/common/.. -isystem ~/.conan2/p/ms-gs0dca0ad769720/p/include -isystem ~/.conan2/p/b/date6715ef15e84c6/p/include -isystem ~/.conan2/p/b/fmt3df35e0a5dd70/p/include -isystem ~/.conan2/p/range0301bf3d76d5d/p/include -isystem ~/.conan2/p/b/spdlofbc5494bb83cc/p/include -isystem ~/.conan2/p/magic063a607ca5409/p/include -isystem ~/.conan2/p/b/catch7924f1ac3297a/p/include -isystem ~/.conan2/p/tromp61e1d5cd3f939/p/include -O2 -DNDEBUG -Wno-error=array-bounds -std=gnu++20 -Werror -Wall -Wextra -g -MD -MT src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o -MF src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o.d -fmodules-ts -fmodule-mapper=src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o src/test/CMakeFiles/xania_test.dir/string_utils_test.cpp.o -c ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp\nIn file included from ~/.conan2/p/b/catch7924f1ac3297a/p/include/catch2/catch_tostring.hpp:17,\n                 from ~/.conan2/p/b/catch7924f1ac3297a/p/include/catch2/internal/catch_decomposer.hpp:11,\n                 from ~/.conan2/p/b/catch7924f1ac3297a/p/include/catch2/internal/catch_assertion_handler.hpp:12,\n                 from ~/.conan2/p/b/catch7924f1ac3297a/p/include/catch2/internal/catch_test_macro_impl.hpp:12,\n                 from ~/.conan2/p/b/catch7924f1ac3297a/p/include/catch2/catch_test_macros.hpp:11,\n                 from ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:3:\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp: In function \u2018void CATCH2_INTERNAL_TEST_133()\u2019:\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:431:15: error: \u2018first_char\u2019 was not declared in this scope\n  431 |         CHECK(first_char(\"yes\") == 'y');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:431:15: error: \u2018first_char\u2019 was not declared in this scope\n  431 |         CHECK(first_char(\"yes\") == 'y');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:435:83: error: \u2018first_char\u2019 was not declared in this scope\n  435 |     SECTION(\"an empty reply gives '\\\\0' instead of reading past the end\") { CHECK(first_char(\"\") == '\\0'); }\n      |                                                                                   ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:435:83: error: \u2018first_char\u2019 was not declared in this scope\n  435 |     SECTION(\"an empty reply gives '\\\\0' instead of reading past the end\") { CHECK(first_char(\"\") == '\\0'); }\n      |                                                                                   ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:438:15: error: \u2018first_char\u2019 was not declared in this scope\n  438 |         CHECK(first_char(line.substr(3)) == '\\0');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:438:15: error: \u2018first_char\u2019 was not declared in this scope\n  438 |         CHECK(first_char(line.substr(3)) == '\\0');\n      |               ^~~~~~~~~~\n~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/src/test/string_utils_test.cpp:440:19: error: \u2018first_char\u2019 was not declared in this scope\n  440 |     static_assert(first_char(\"\") == '\\0' && first_char(\"g\") == 'g');\n      |                   ^~~~~~~~~~\nninja: build stopped: subcommand failed.\nmake: *** [Makefile:46: build] Error 1",
+   "data": {
+    "exit": 2,
+    "needs_change": true
+   }
+  },
+  {
+   "key": "build.base-for-sim",
+   "title": "Debug build of the base as it is (for Sim's trials on it)",
+   "ok": true,
+   "expected": "it compiles and installs",
+   "detail": "built in 7 s",
+   "seconds": 7.2,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-3-nanny-reads-argument-0-of-an/base/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "before-after",
+   "title": "The new tests, before and after the change",
+   "ok": null,
+   "expected": "each new test fails or aborts on the base in at least one build, and passes on the branch",
+   "detail": "the new tests pass on the branch; they can't build on the base (they test code the change adds), so the base side is Sim's",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "case": "first_char",
+      "base.debug": "not run",
+      "base.release": "not run",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "can't build before the change"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.0.branch",
+   "title": "Sim `smoke` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 20 s",
+   "seconds": 21.2,
+   "log": "smoke: Smoke: create a bot, look, quit (20 s, Xania f7a0c3b52d)\n  transcript: runs\\20261111-112305\\Smokea.log\n  result: clean",
+   "data": {
+    "measurements": {},
+    "findings": [],
+    "seconds": 20.5,
+    "commit": "f7a0c3b52d2c174239b844c83888be47fc79bb01",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "Smokea created"
+     },
+     {
+      "ok": true,
+      "summary": "looked around"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.1.base",
+   "title": "Sim `lobby` on the base",
+   "ok": true,
+   "expected": "it reproduces `nanny` (the bug is there)",
+   "detail": "reproduced: xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp) (ConfirmNewName crashed, GetNewSex crashed, GetAlignment crashed, DefaultChoice crashed, BreakConnect crashed)",
+   "seconds": 112.3,
+   "log": "[00:37] lobby GetNewSex: xania died (prompt=Are you male, female or other (M/F/O)? reply=)\n[00:50] lobby GetAlignment: walking to the prompt\n[00:56] lobby GetAlignment: xania died (prompt=Which alignment (G/N/E)? reply=)\n[01:09] lobby DefaultChoice: walking to the prompt\n[01:15] lobby DefaultChoice: xania died (prompt=Customize (Y/N)? reply=)\n[01:28] lobby BreakConnect: walking to the prompt\n[01:37] lobby BreakConnect: xania died (prompt=Do you wish to connect anyway (Y/N)? reply=)\nlobby: Lobby: an empty reply at each login prompt (112 s, Xania 82171fa443)\n  ConfirmNewName crashed, GetNewSex crashed, GetAlignment crashed, DefaultChoice crashed, BreakConnect crashed\n  failed: lobby: ConfirmNewName: XANIA DIED after an empty reply to \"Did I hear that right - 'Lobbya' (Y/N)?\"\n  failed: lobby: GetNewSex: XANIA DIED after an empty reply to 'Are you male, female or other (M/F/O)?'\n  failed: lobby: GetAlignment: XANIA DIED after an empty reply to 'Which alignment (G/N/E)?'\n  failed: lobby: DefaultChoice: XANIA DIED after an empty reply to 'Customize (Y/N)?'\n  failed: lobby: BreakConnect: XANIA DIED after an empty reply to 'Do you wish to connect anyway (Y/N)?'\n  [known] high xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)\n  [known] high xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)\n  [known] high xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)\n  [known] high xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)\n  [known] high xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)\n  crash_ConfirmNewName: runs\\lobby-20261111-112312\\xania-crash-ConfirmNewName.txt\n  crash_GetNewSex: runs\\lobby-20261111-112312\\xania-crash-GetNewSex.txt\n  crash_GetAlignment: runs\\lobby-20261111-112312\\xania-crash-GetAlignment.txt\n  crash_DefaultChoice: runs\\lobby-20261111-112312\\xania-crash-DefaultChoice.txt\n  crash_BreakConnect: runs\\lobby-20261111-112312\\xania-crash-BreakConnect.txt\n  result: clean",
+   "data": {
+    "measurements": {
+     "ConfirmNewName": "crashed",
+     "GetNewSex": "crashed",
+     "GetAlignment": "crashed",
+     "DefaultChoice": "crashed",
+     "BreakConnect": "crashed"
+    },
+    "findings": [
+     {
+      "signature": "crash:SIGABRT:MudImpl.cpp:MudImpl::nanny",
+      "title": "xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)",
+      "status": "known"
+     },
+     {
+      "signature": "crash:SIGABRT:MudImpl.cpp:MudImpl::nanny",
+      "title": "xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)",
+      "status": "known"
+     },
+     {
+      "signature": "crash:SIGABRT:MudImpl.cpp:MudImpl::nanny",
+      "title": "xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)",
+      "status": "known"
+     },
+     {
+      "signature": "crash:SIGABRT:MudImpl.cpp:MudImpl::nanny",
+      "title": "xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)",
+      "status": "known"
+     },
+     {
+      "signature": "crash:SIGABRT:MudImpl.cpp:MudImpl::nanny",
+      "title": "xania crashed (SIGABRT, failed assertion) in MudImpl::nanny (MudImpl.cpp)",
+      "status": "known"
+     }
+    ],
+    "seconds": 111.7,
+    "commit": "82171fa4434933217c5995dc45ae730c4c635928"
+   }
+  },
+  {
+   "key": "sim.1.branch",
+   "title": "Sim `lobby` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 50 s (ConfirmNewName still up, GetNewSex still up, GetAlignment still up, DefaultChoice still up, BreakConnect still up)",
+   "seconds": 50.3,
+   "log": "[00:14] lobby ConfirmNewName: walking to the prompt\n[00:19] lobby ConfirmNewName: survived (prompt=Did I hear that right - 'Lobbya' (Y/N)? reply=It's quite simple - type Yes or No:)\n[00:19] lobby GetNewSex: walking to the prompt\n[00:25] lobby GetNewSex: survived (prompt=Are you male, female or other (M/F/O)? reply=Please specify (M)ale, (F)emale or (O)ther.)\n[00:25] lobby GetAlignment: walking to the prompt\n[00:31] lobby GetAlignment: survived (prompt=Which alignment (G/N/E)? reply=That's not a valid alignment.\nWhich alignment (G/N/E)?)\n[00:31] lobby DefaultChoice: walking to the prompt\n[00:38] lobby DefaultChoice: survived (prompt=Customize (Y/N)? reply=Please answer (Y/N)?)\n[00:38] lobby BreakConnect: walking to the prompt\n[00:47] lobby BreakConnect: survived (prompt=Do you wish to connect anyway (Y/N)? reply=Please type Y or N?)\nlobby: Lobby: an empty reply at each login prompt (50 s, Xania f7a0c3b52d)\n  ConfirmNewName still up, GetNewSex still up, GetAlignment still up, DefaultChoice still up, BreakConnect still up\n  result: clean",
+   "data": {
+    "measurements": {
+     "ConfirmNewName": "still up",
+     "GetNewSex": "still up",
+     "GetAlignment": "still up",
+     "DefaultChoice": "still up",
+     "BreakConnect": "still up"
+    },
+    "findings": [],
+    "seconds": 49.7,
+    "commit": "f7a0c3b52d2c174239b844c83888be47fc79bb01",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "ConfirmNewName: still up after an empty reply to \"Did I hear that right - 'Lobbya' (Y/N)?\""
+     },
+     {
+      "ok": true,
+      "summary": "GetNewSex: still up after an empty reply to 'Are you male, female or other (M/F/O)?'"
+     },
+     {
+      "ok": true,
+      "summary": "GetAlignment: still up after an empty reply to 'Which alignment (G/N/E)?'"
+     },
+     {
+      "ok": true,
+      "summary": "DefaultChoice: still up after an empty reply to 'Customize (Y/N)?'"
+     },
+     {
+      "ok": true,
+      "summary": "BreakConnect: still up after an empty reply to 'Do you wish to connect anyway (Y/N)?'"
+     }
+    ]
+   }
+  },
+  {
+   "key": "before-proof",
+   "title": "Proof the bug was there before the change",
+   "ok": true,
+   "expected": "a new test fails on the base, or a Sim trial shows the bug on the base",
+   "detail": "Sim showed it on the base: Sim `lobby` on the base",
+   "seconds": 0.0,
+   "log": "",
+   "data": {}
+  },
+  {
+   "key": "static",
+   "title": "Builder's detectors on the focus, base against branch",
+   "ok": true,
+   "expected": "no string_view indexed like a C string is left in the focus",
+   "detail": "6 before, 1 after",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "function": "MudImpl::nanny",
+      "base": [
+       "`argument[0]` at src/MudImpl.cpp:711",
+       "`argument[0]` at src/MudImpl.cpp:740",
+       "`argument[0]` at src/MudImpl.cpp:762",
+       "`argument[0]` at src/MudImpl.cpp:854",
+       "`argument[0]` at src/MudImpl.cpp:890",
+       "`argument[0]` at src/MudImpl.cpp:915"
+      ],
+      "branch": [
+       "`argument[0]` at src/MudImpl.cpp:762"
+      ]
+     },
+     {
+      "function": "Descriptor::pop_incomm",
+      "base": [],
+      "branch": []
+     }
+    ]
+   }
+  }
+ ],
+ "error": "",
+ "passed": true,
+ "exit_code": 0
+}

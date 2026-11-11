@@ -1,0 +1,16 @@
+# What `prototype` runs for #2, beyond format, builds and unit tests (always run).
+# The bug needs a quit in the same 250 ms pulse as a tick, so it's statistical: churn makes thousands of quits.
+base = "82171fa"   # main of the fork and of upstream when the issue was filed
+
+[[sim]]
+args = ["smoke"]
+why = "the game still boots and a player can create a character, look and quit"
+branch = "clean"
+
+[[sim]]
+args = ["churn", "--bots", "6", "--minutes", "15"]
+why = "six bots create characters and quit in a loop on the Debug (AddressSanitizer) build: on the base it hit the use-after-free in about a minute"
+finding = "heap-use-after-free"
+base = "reproduces"
+branch = "clean"
+timeout = 1500

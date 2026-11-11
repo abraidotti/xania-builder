@@ -1,0 +1,382 @@
+{
+ "schema": 1,
+ "idea": {
+  "kind": "issue",
+  "ref": "#2",
+  "title": "Quitting on a tick pulse: char_update reads a freed Descriptor (use-after-free)",
+  "text": "## Summary\n\nA player quitting on the same pulse as a tick makes `char_update()` read a freed `Descriptor`. `extract_char`\nleaves `ch->desc` pointing at the descriptor and leaves the character in `char_list` until garbage collection, so\nwhen the game loop frees the closed descriptor and a tick runs before the character is collected, `char_update()`\nfollows the dangling pointer.\n\n- **AddressSanitizer builds** abort with a heap-use-after-free.\n- **Normal builds** have undefined behaviour: usually a harmless read of stale memory, occasionally a crash or a\n  wrong `is_immortal()` answer.\n\nIt needs a quit in the same 250 ms pulse as a tick (ticks are every 30-60 s): rare for people, common for anything\nthat logs in and out a lot.\n\nPresent at `82171fa` (current `main` of both this fork and mattgodbolt/xania; same lines in handler.cpp and\nupdate.cpp).\n\n## How to reproduce\n\nWith an ASan build, have several clients create a character and `quit` in a loop. xania-sim's churn trial does this\nand crashes it in about a minute (42 quits in 59 s on 82171fa):\n\n```\npython -m xania_sim churn --bots 6 --minutes 15\n```\n\n```\n==95237==ERROR: AddressSanitizer: heap-use-after-free\nREAD of size 8\n    #0 Descriptor::is_switched() const     src/Descriptor.hpp:163\n    #1 Char::get_trust() const             src/Char.cpp:118\n    #2 Char::is_immortal() const           src/Char.cpp:113\n    #3 char_update()                       src/update.cpp:705\n    #4 update_handler(Mud&)                src/update.cpp:882\n    #5 MudImpl::game_loop()                src/MudImpl.cpp:332\nfreed by:\n    DescriptorList::reap_closed()          src/DescriptorList.cpp:8\n    MudImpl::game_loop()                   src/MudImpl.cpp:327\nallocated by:\n    DescriptorList::create(...)            src/DescriptorList.cpp:18\n    MudImpl::handle_doorman_packet(...)    src/MudImpl.cpp:487\n```\n\n## Faulty lines\n\n| Where | Code | Role |\n|---|---|---|\n| `src/act_comm.cpp:375-379` | `do_quit`: save, `extract_char(ch, true)`, then `d->close()` | starts it |\n| `src/handler.cpp:632-635` | `extract_char`: `ch->desc->character(nullptr)` | **the bug**: detaches the descriptor from the character but leaves `ch->desc` pointing at it, and only queues the character in `reapable_chars` instead of removing it from `char_list` |\n| `src/MudImpl.cpp:327` | `descriptors().reap_closed()` | frees the closed descriptor, before `update_handler` runs (line 332) |\n| `src/update.cpp:882` / `:890` | `char_update()` runs before `collect_all_garbage()` | on a tick pulse, the quitting character is still iterated |\n| `src/update.cpp:705` | `ch->is_immortal()` | goes through `get_trust()` to `desc->is_switched()` on the freed descriptor |\n\n## Suggested fix\n\nIn `extract_char`, clear the back-pointer too:\n\n```cpp\nif (ch->desc) {\n    ch->desc->character(nullptr);\n    ch->desc = nullptr;\n}\n```\n\n`do_quit` already reads `d = ch->desc` before calling `extract_char`, so it still closes the right descriptor.\nAlternatively (or as well), `char_update` and the other per-tick loops could skip characters already queued in\n`reapable_chars`.\n\n## How this was found\n\nIt first showed up in [xania-sim](https://github.com/abraidotti/xania-sim)'s regression suite (1 run in 3), during a\nscenario that creates a character, quits and logs back in, on an AddressSanitizer build. xania-sim's churn trial\nwas then written to reproduce it on purpose. It also turns up in the area trial, whose bots quit together at the\nend of each level.\n",
+  "url": "https://github.com/abraidotti/xania/issues/2",
+  "labels": []
+ },
+ "focus": {
+  "functions": [
+   {
+    "name": "do_quit",
+    "where": "src/act_comm.cpp:342",
+    "lines": 39
+   },
+   {
+    "name": "extract_char",
+    "where": "src/handler.cpp:591",
+    "lines": 46
+   },
+   {
+    "name": "MudImpl::game_loop",
+    "where": "src/MudImpl.cpp:180",
+    "lines": 180
+   },
+   {
+    "name": "update_handler",
+    "where": "src/update.cpp:856",
+    "lines": 36
+   },
+   {
+    "name": "char_update",
+    "where": "src/update.cpp:655",
+    "lines": 167
+   },
+   {
+    "name": "Char::is_immortal",
+    "where": "src/Char.cpp:113",
+    "lines": 1
+   },
+   {
+    "name": "collect_all_garbage",
+    "where": "src/update.cpp:845",
+    "lines": 4
+   },
+   {
+    "name": "Char::get_trust",
+    "where": "src/Char.cpp:117",
+    "lines": 12
+   },
+   {
+    "name": "is_switched",
+    "where": "src/Descriptor.hpp:163",
+    "lines": 1
+   }
+  ],
+  "files": [
+   "src/act_comm.cpp",
+   "src/handler.cpp",
+   "src/MudImpl.cpp",
+   "src/update.cpp",
+   "src/Char.cpp",
+   "src/Descriptor.hpp"
+  ],
+  "commands": [
+   "quit"
+  ],
+  "lines": [
+   "src/act_comm.cpp:375",
+   "src/handler.cpp:632",
+   "src/MudImpl.cpp:327",
+   "src/update.cpp:882",
+   "src/update.cpp:705"
+  ],
+  "stack": [
+   [
+    "is_switched",
+    "src/Descriptor.hpp:163"
+   ],
+   [
+    "Char::get_trust",
+    "src/Char.cpp:118"
+   ],
+   [
+    "Char::is_immortal",
+    "src/Char.cpp:113"
+   ],
+   [
+    "char_update",
+    "src/update.cpp:705"
+   ],
+   [
+    "update_handler",
+    "src/update.cpp:882"
+   ],
+   [
+    "MudImpl::game_loop",
+    "src/MudImpl.cpp:332"
+   ]
+  ],
+  "why": {
+   "function:do_quit": "src/act_comm.cpp:375 is in it",
+   "function:extract_char": "src/handler.cpp:632 is in it",
+   "function:MudImpl::game_loop": "src/MudImpl.cpp:327 is in it",
+   "function:update_handler": "src/update.cpp:882 is in it",
+   "function:char_update": "src/update.cpp:705 is in it",
+   "function:Char::is_immortal": "named in the idea",
+   "function:collect_all_garbage": "named in the idea",
+   "function:Char::get_trust": "named in the idea",
+   "function:is_switched": "innermost frame of a reported backtrace (src/Descriptor.hpp:163)"
+  }
+ },
+ "commit": "82171fa4434933217c5995dc45ae730c4c635928",
+ "dirty": false,
+ "generated": 1794410178.8422782,
+ "gate": {
+  "builds": [
+   "Debug (ASan, UBSan, LSan, libstdc++ assertions)",
+   "Release (-O2)"
+  ],
+  "unit_tests": [
+   "src/apps/test/pfutest.cpp",
+   "src/test/BansTest.cpp",
+   "src/test/CharTest.cpp",
+   "src/test/DamageMessagesTest.cpp",
+   "src/test/DamageToleranceTest.cpp",
+   "src/test/DescriptorTest.cpp",
+   "src/test/HitChanceTest.cpp",
+   "src/test/InjuredPartTest.cpp",
+   "src/test/InterpreterImplTest.cpp",
+   "src/test/LearningTest.cpp",
+   "src/test/NoteTest.cpp",
+   "src/test/ObjectTest.cpp",
+   "src/test/PcNutritionTest.cpp",
+   "src/test/PositionTest.cpp",
+   "src/test/PracticeTabulatorTest.cpp",
+   "src/test/PromptFormatTest.cpp",
+   "src/test/PronounsTest.cpp",
+   "src/test/SkillsTabulatorTest.cpp",
+   "src/test/SocialsTest.cpp",
+   "src/test/TitlesTest.cpp",
+   "src/test/act_obj_test.cpp",
+   "src/test/save_test.cpp"
+  ],
+  "sim": [
+   {
+    "command": "smoke",
+    "why": "the game still boots and a player can log in"
+   },
+   {
+    "command": "hunt --minutes 5",
+    "why": "fights and what runs after a kill (autoloot) reach it"
+   },
+   {
+    "command": "churn --minutes 5",
+    "why": "logins and quits reach it (lifetime bugs show here)"
+   }
+  ],
+  "regressions": [
+   "Sim finding `crash:asan-heap-use-after-free:Descriptor.hpp:Descriptor::is_switched` should stop reproducing (https://github.com/abraidotti/xania/issues/2)"
+  ]
+ },
+ "sections": [
+  {
+   "key": "explorer",
+   "title": "Explorer insights",
+   "facts": [
+    "Bug check `code.lose-level-asymmetry` (present, wrong-behaviour): Losing a level doesn't undo what gaining it gave. update.cpp:480, update.cpp:539"
+   ],
+   "questions": [
+    "The fix should turn the code check above to `fixed` (it matches the faulty pattern). Does it, and are there other occurrences to fix at the same time?"
+   ],
+   "note": ""
+  },
+  {
+   "key": "architecture",
+   "title": "Architecture",
+   "facts": [
+    "Reported call path (innermost first): `is_switched` (src/Descriptor.hpp:163) <- `Char::get_trust` (src/Char.cpp:118) <- `Char::is_immortal` (src/Char.cpp:113) <- `char_update` (src/update.cpp:705) <- `update_handler` (src/update.cpp:882) <- `MudImpl::game_loop` (src/MudImpl.cpp:332)",
+    "`do_quit` is defined at src/act_comm.cpp:342-380 (39 lines): `void do_quit(Char *ch)`",
+    "`do_quit` handles the command(s) `quit` (minimum position ?, src/InterpreterImpl.cpp:276)",
+    "Called from `do_delete` (src/act_comm.cpp:39), `do_deny` (src/act_wiz.cpp:178), `char_update` (src/update.cpp:655); so it also runs without a player typing it",
+    "`do_quit` calls `act` (7 definitions), `announce`, `close` (6 definitions), `extract_char`, `format` (8 definitions), `is_npc`, `is_pos_dying`, `is_pos_fighting`, `log_string` (2 definitions), `logger` (2 definitions), `save_char_obj` (2 definitions), `send_line` (2 definitions) and 2 more",
+    "`do_quit` reaches persisted or shared state: character lifetimes, player files",
+    "`extract_char` is defined at src/handler.cpp:591-636 (46 lines): `void extract_char(Char *ch, bool delete_from_world)`",
+    "Called from `do_quit` (src/act_comm.cpp:342), `nuke_pets` (src/act_comm.cpp:481), `do_purge` (src/act_wiz.cpp:1355), `CharUpgraderResult::~CharUpgraderResult` (src/apps/pfu.cpp:141), `raw_kill` (src/fight.cpp:1300), `do_mppurge` (src/mob_commands.cpp:254), `char_update` (src/update.cpp:655)",
+    "`extract_char` calls `bug` (2 definitions), `char_from_room`, `char_to_room`, `character` (3 definitions), `die_follower`, `do_return` (2 definitions), `extract_obj` (2 definitions), `get` (2 definitions), `get_room`, `is_npc`, `is_switched` (2 definitions), `logger` (2 definitions) and 3 more",
+    "`extract_char` reaches persisted or shared state: object lifetimes",
+    "`MudImpl::game_loop` is defined at src/MudImpl.cpp:180-359 (180 lines): `void MudImpl::game_loop()`",
+    "Called from `main` (src/main.cpp:15)",
+    "`game_loop` calls `accept`, `all` (2 definitions), `bug` (2 definitions), `character` (3 definitions), `clear_output_buffer`, `close` (6 definitions), `descriptors`, `doorman_init`, `doorman_lost`, `handle_doorman_packet`, `handle_signal_shutdown`, `has_buffered_output` and 19 more",
+    "`game_loop` reaches persisted or shared state: player files",
+    "`update_handler` is defined at src/update.cpp:856-891 (36 lines): `void update_handler(Mud &mud)`",
+    "Called from `MudImpl::game_loop` (src/MudImpl.cpp:180)",
+    "`update_handler` calls `advance` (2 definitions), `aggr_update`, `area_update`, `areas`, `char_update`, `collect_all_garbage`, `count_update`, `current_tick`, `descriptors`, `log_new`, `logger` (2 definitions), `mobile_update` and 5 more",
+    "`char_update` is defined at src/update.cpp:655-821 (167 lines): `void char_update()`",
+    "Called from `update_handler` (src/update.cpp:856)",
+    "`char_update` calls `act` (7 definitions), `affect_join`, `affect_remove`, `at`, `channel`, `check_damage_tolerance`, `check_duel_timeout`, `clear_enum_bit`, `damage`, `delta_hunger`, `delta_inebriation`, `delta_thirst` and 27 more",
+    "`char_update` reaches persisted or shared state: character lifetimes, object lifetimes, player files",
+    "`Char::is_immortal` is defined at src/Char.cpp:113-113 (1 lines): `bool Char::is_immortal() const`",
+    "Called from `do_score` (src/act_info.cpp:1032), `who_line_for` (src/act_info.cpp:1174), `can_loot` (src/act_obj.cpp:517), `do_channels` (src/channels.cpp:36), `do_immtalk` (src/channels.cpp:128), `Char::can_see` (src/Char.cpp:131), `Char::can_see` (src/Char.cpp:364), `Char::has_boat` (src/Char.cpp:464), `Char::delta_nutrition` (src/Char.cpp:491), `is_mortal` (src/Char.hpp:227), `validate_duellists` (src/Duel.cpp:25), `is_safe` (src/fight.cpp:877), `is_safe_spell` (src/fight.cpp:934), `spell_calm` (src/magic.cpp:838), `spell_vampire` (src/magic.cpp:2144), `spell_locate_object` (src/magic.cpp:2814), `isimmort` (src/MProgImpl.cpp:181), `MudImpl::lobby_show_motd` (src/MudImpl.cpp:421), `MudImpl::nanny` (src/MudImpl.cpp:603), `Note::is_to` (src/Note.cpp:28), `format_one_prompt_part` (src/PromptFormat.cpp:16), `CharSaver::save` (src/save.cpp:840), `CharSaver::save` (src/save.cpp:858), `char_update` (src/update.cpp:655)",
+    "`is_immortal` calls `get_trust`",
+    "`collect_all_garbage` is defined at src/update.cpp:845-848 (4 lines): `void collect_all_garbage()`",
+    "Called from `main` (src/apps/pfumain.cpp:29), `update_handler` (src/update.cpp:856)",
+    "`collect_all_garbage` calls `collect_garbage`",
+    "`Char::get_trust` is defined at src/Char.cpp:117-128 (12 lines): `int Char::get_trust() const`",
+    "Called from `show_char_to_char` (src/act_info.cpp:311), `do_score` (src/act_info.cpp:1032), `do_help` (src/act_info.cpp:1140), `move_char` (src/act_move.cpp:86), `do_enter` (src/act_move.cpp:241), `get_obj` (src/act_obj.cpp:544), `char_can_clone_obj` (src/act_wiz.cpp:81), `do_deny` (src/act_wiz.cpp:178), `do_echo` (src/act_wiz.cpp:271), `do_recho` (src/act_wiz.cpp:282), `do_zecho` (src/act_wiz.cpp:294), `do_pecho` (src/act_wiz.cpp:306), `do_transfer` (src/act_wiz.cpp:344), `do_at` (src/act_wiz.cpp:417), `do_goto` (src/act_wiz.cpp:458), `do_rstat` (src/act_wiz.cpp:562), `do_snoop` (src/act_wiz.cpp:1134), `do_clone` (src/act_wiz.cpp:1219), `do_purge` (src/act_wiz.cpp:1355), `do_advance` (src/act_wiz.cpp:1406), `do_trust` (src/act_wiz.cpp:1471), `do_restore` (src/act_wiz.cpp:1502), `do_freeze` (src/act_wiz.cpp:1562), `toggle_player_comm_flag` (src/act_wiz.cpp:1630), `do_coma` (src/act_wiz.cpp:1745), `do_sockets` (src/act_wiz.cpp:2440), `do_force` (src/act_wiz.cpp:2478), `toggle_wiz_visibility` (src/act_wiz.cpp:2559), `do_smite` (src/act_wiz.cpp:2624), `Bans::ban_site` (src/Ban.cpp:66), `do_immtalk` (src/channels.cpp:128), `Char::is_wizinvis_to` (src/Char.cpp:106), `Char::is_prowlinvis_to` (src/Char.cpp:109), `Char::is_immortal` (src/Char.cpp:113), `Char::is_hero` (src/Char.cpp:114), `Char::can_see` (src/Char.cpp:364), `do_noclanchan` (src/clan.cpp:126), `do_member` (src/clan.cpp:158), `do_clanset` (src/clan.cpp:274), `Descriptor::close` (src/Descriptor.cpp:215), `do_slay` (src/fight.cpp:2475), `do_finger` (src/Finger.cpp:177), `flag_set` (src/FlagFormat.hpp:77), `Interpreter::Impl::interpret` (src/InterpreterImpl.cpp:495), `Interpreter::show_player_commands` (src/InterpreterImpl.cpp:571), `Interpreter::show_immortal_commands` (src/InterpreterImpl.cpp:576), `Logger::log_new` (src/Logging.cpp:46), `spell_charm_person` (src/magic.cpp:1072), `spell_enchant_weapon` (src/magic.cpp:1825), `do_mpforce` (src/mob_commands.cpp:400), `MudImpl::nanny` (src/MudImpl.cpp:603), `MudImpl::check_reconnect` (src/MudImpl.cpp:1090), `NoteHandler::on_command` (src/Note.cpp:198), `format_one_prompt_part` (src/PromptFormat.cpp:16), `CharSaver::save` (src/save.cpp:858)",
+    "`get_trust` calls `is_npc`, `is_switched` (2 definitions), `original`",
+    "`is_switched` is defined at src/Descriptor.hpp:163-163 (1 lines): `[[nodiscard]] bool is_switched() const noexcept`",
+    "Called from `do_switch` (src/act_wiz.cpp:1170), `do_return` (src/act_wiz.cpp:1205), `Char::get_trust` (src/Char.cpp:117), `Descriptor::do_switch` (src/Descriptor.cpp:271), `Descriptor::do_return` (src/Descriptor.cpp:283), `validate_duellists` (src/Duel.cpp:25), `extract_char` (src/handler.cpp:591)",
+    "`src/act_comm.cpp`: 672 lines, 28 functions",
+    "`src/handler.cpp`: 847 lines, 44 functions",
+    "`src/MudImpl.cpp`: 1114 lines, 44 functions",
+    "`src/update.cpp`: 892 lines, 19 functions",
+    "`src/Char.cpp`: 638 lines, 115 functions",
+    "`src/Descriptor.hpp`: 165 lines, 26 functions"
+   ],
+   "questions": [
+    "Is the change local to these functions, or does the fix belong in a shared helper their callers use too?",
+    "Does every caller (including automatic ones) still get the behaviour it expects?"
+   ],
+   "note": ""
+  },
+  {
+   "key": "patterns",
+   "title": "Design patterns",
+   "facts": [
+    "In `do_quit`: fmt::format x1 (modern), act() x1 (either)",
+    "155 other functions share the signature `(Char *ch)`; in the same file: `die_follower`, `do_delet`, `do_pose`, `do_qui`, `do_save`, `nuke_pets`, `stop_follower`",
+    "In `extract_char`: range-for over contents x1 (modern)",
+    "In `game_loop`: range-for over contents x2 (modern)",
+    "In `char_update`: range-for over contents x3 (modern), act() x7 (either)",
+    "Across src/: act() 779, std::string_view 625, ArgParser 402, matches()/matches_start() 291, range-for over contents 267, fmt::format 211, sprintf/strcpy/strcat 19, '\\0' terminator checks 14, char buffers 10"
+   ],
+   "questions": [
+    "Which existing idiom does the change follow, and does it leave the function more consistent?",
+    "Is there a helper already (in the same file or a header) that does what the change needs?"
+   ],
+   "note": ""
+  },
+  {
+   "key": "debt",
+   "title": "Technical debt",
+   "facts": [
+    "`game_loop` is 180 lines long (src/ median 7).",
+    "`char_update` is 167 lines long (src/ median 7).",
+    "TODO at src/act_comm.cpp:127: (#134) use the victim's timezone info.",
+    "TODO at src/MudImpl.cpp:28: remove this",
+    "TODO at src/MudImpl.cpp:44: move these?",
+    "TODO at src/MudImpl.cpp:57: Move into a Universe class",
+    "TODO at src/MudImpl.cpp:96: do something rather than return here if there's a failure",
+    "TODO at src/MudImpl.cpp:456: remove global",
+    "TODO at src/MudImpl.cpp:668: crypt can return null if if fails (e.g. password is truncated)."
+   ],
+   "questions": [
+    "Are the other places with the same pattern the same bug, and do they belong in this change?",
+    "What debt does the change pay down while it's here, and what does it deliberately leave?",
+    "Does the change add any (a special case, a duplicated check, a new legacy idiom)?"
+   ],
+   "note": ""
+  },
+  {
+   "key": "gameplay",
+   "title": "Gameplay",
+   "facts": [
+    "Players reach this with `quit` (from position any up).",
+    "`do_quit` also runs on its own from `char_update` (src/update.cpp:655): players who never type the command are affected too (e.g. through an auto setting).",
+    "Messages `do_quit` can show: \"|cDon't you want to post your note first?|w\"; \"|RNo way! You are fighting.|w\"; \"|RYou're not DEAD yet.|w\"; \"Your duel came to an end as your opponent quit.\"; \"|WYou quit reality for the game.|w\"; \"|W$n has left reality for the game.|w\"; \"{} has quit.\"; \"|W### |P{}|W departs, seeking another reality.|w\"",
+    "Messages `extract_char` can show: \"extract_char: null room, ch: {} #{}\"",
+    "Messages `game_loop` can show: \"Running under a debugger\"; \"Doorman socket not initialized, exiting!\"; \"Xania is ready to rock via {}.\"; \"Game_loop: select: poll\"; \"Unable to read signal info - treating as term\"; \"Caught SIGINT but detected a debugger, trapping instead\"; \"Unexpected signal {}: ignoring\"; \"Waiting for doorman...\"; \"Doorman has connected.\"; \"Unable to accept doorman connection: {}\" (+2)",
+    "Messages `char_update` can show: \"$p goes out.\"; \"$p flickers and goes out.\"; \"$p flickers.\"; \"$n fits violently before decaying in to a pile of dust.\"; \"$n writhes in agony as plague sores erupt from $s skin.\"; \"You writhe in agony from the plague.\"; \"You feel hot and feverish.\"; \"$n shivers and looks very ill.\"; \"$n shivers and suffers.\"; \"You shiver and suffer.\"",
+    "Balance numbers Explorer models from these files: none (the change is behaviour, not balance; Explorer's predictions shouldn't move)"
+   ],
+   "questions": [
+    "What does a player notice before and after (messages, what they get, what's refused)?",
+    "Can a careless or abusive player use the change (or the old behaviour) to their advantage?",
+    "Does it change balance for any class, race or level range? If so, which Explorer numbers?"
+   ],
+   "note": ""
+  },
+  {
+   "key": "docs",
+   "title": "Documentation",
+   "facts": [
+    "Help `QUIT SAVE` (area/Help.are:1017, level 0): Syntax: QUIT",
+    "`README.md` mentions `quit`"
+   ],
+   "questions": [
+    "Does any help entry describe the behaviour being changed, and does it need rewording?",
+    "Does the change need a note anywhere else (README, release notes, an issue comment)?"
+   ],
+   "note": ""
+  },
+  {
+   "key": "tests",
+   "title": "Test coverage",
+   "facts": [
+    "`src/apps/test/pfutest.cpp`: mentions collect_all_garbage",
+    "`src/test/ObjectTest.cpp`: mentions collect_all_garbage",
+    "`src/test/save_test.cpp`: mentions collect_all_garbage",
+    "`src/apps/test/pfutest.cpp`: mentions collect_all_garbage",
+    "`src/test/HitChanceTest.cpp`: includes handler.hpp",
+    "`src/test/InjuredPartTest.cpp`: includes handler.hpp",
+    "`src/test/ObjectTest.cpp`: includes handler.hpp, mentions collect_all_garbage",
+    "`src/test/save_test.cpp`: includes handler.hpp, mentions collect_all_garbage",
+    "`src/apps/test/pfutest.cpp`: includes MudImpl.hpp, mentions collect_all_garbage",
+    "`src/test/ObjectTest.cpp`: mentions collect_all_garbage",
+    "`src/test/save_test.cpp`: includes MudImpl.hpp, mentions collect_all_garbage",
+    "`src/apps/test/pfutest.cpp`: includes update.hpp, mentions collect_all_garbage",
+    "`src/test/ObjectTest.cpp`: includes update.hpp, mentions collect_all_garbage",
+    "`src/test/save_test.cpp`: includes update.hpp, mentions collect_all_garbage",
+    "`src/apps/test/pfutest.cpp`: mentions collect_all_garbage",
+    "`src/test/act_obj_test.cpp`: includes Char.hpp",
+    "`src/test/BansTest.cpp`: includes Char.hpp",
+    "`src/test/CharTest.cpp`: named after Char.cpp, includes Char.hpp",
+    "`src/test/DamageMessagesTest.cpp`: includes Char.hpp",
+    "`src/test/DamageToleranceTest.cpp`: includes Char.hpp",
+    "`src/test/DescriptorTest.cpp`: includes Char.hpp",
+    "`src/test/InjuredPartTest.cpp`: includes Char.hpp",
+    "`src/test/InterpreterImplTest.cpp`: includes Char.hpp",
+    "`src/test/LearningTest.cpp`: includes Char.hpp",
+    "`src/test/NoteTest.cpp`: includes Char.hpp",
+    "`src/test/ObjectTest.cpp`: mentions collect_all_garbage",
+    "`src/test/PcNutritionTest.cpp`: includes Char.hpp",
+    "`src/test/PositionTest.cpp`: includes Char.hpp",
+    "`src/test/PracticeTabulatorTest.cpp`: includes Char.hpp",
+    "`src/test/PromptFormatTest.cpp`: includes Char.hpp",
+    "`src/test/PronounsTest.cpp`: includes Char.hpp",
+    "`src/test/save_test.cpp`: includes Char.hpp, mentions collect_all_garbage",
+    "`src/test/SkillsTabulatorTest.cpp`: includes Char.hpp",
+    "`src/test/SocialsTest.cpp`: includes Char.hpp",
+    "`src/test/TitlesTest.cpp`: includes Char.hpp",
+    "`src/apps/test/pfutest.cpp`: mentions collect_all_garbage",
+    "`src/test/DescriptorTest.cpp`: named after Descriptor.hpp, includes Descriptor.hpp",
+    "`src/test/ObjectTest.cpp`: mentions collect_all_garbage",
+    "`src/test/save_test.cpp`: mentions collect_all_garbage",
+    "No unit test calls `do_quit`.",
+    "No unit test calls `extract_char`.",
+    "No unit test calls `game_loop`.",
+    "No unit test calls `update_handler`.",
+    "No unit test calls `char_update`.",
+    "No unit test calls `is_immortal`.",
+    "No unit test calls `get_trust`.",
+    "No unit test calls `is_switched`.",
+    "Sim finding `crash:asan-heap-use-after-free:Descriptor.hpp:Descriptor::is_switched` [known, seen 3x]: xania crashed (AddressSanitizer: heap-use-after-free) in Descriptor::is_switched (Descriptor.hpp) (https://github.com/abraidotti/xania/issues/2)"
+   ],
+   "questions": [
+    "Which unit test pins the fixed behaviour (a test that fails before the change)?",
+    "Which Sim trial or scenario shows it from a player's side, and should a new one be added?"
+   ],
+   "note": ""
+  },
+  {
+   "key": "history",
+   "title": "History",
+   "facts": [
+    "`do_quit` (39 lines) comes from 15 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (21 lines); `a2c31f5` (2020-09-02, Matt Godbolt): Formatting changes. (4 lines); `9be5fe8` (2021-05-28, snellers): Convert Char position to an enum and wrapper class. Char position accessor methods. (2 lines); `04a385d` (2020-09-13, Matt Godbolt): Use function overloading to support no-arg commands without the (void) nonsense (1 lines)",
+    "`extract_char` (46 lines) comes from 15 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (23 lines); `794d45b` (2023-09-04, snellers): - char_list takes ownership of all Chars. Replace all remaining naked new/delete! (5 lines); `3eee938` (2020-08-04, Matt Godbolt): NULL->nullptr (3 lines); `687f6ce` (2025-05-11, snellers): Step 2 of the next big refactoring project. (2 lines)",
+    "`game_loop` (180 lines) comes from 18 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (50 lines); `e164685` (2020-08-13, Matt Godbolt): Clean up and use the shared FD code for some of the xania->doorman side of things (28 lines); `687f6ce` (2025-05-11, snellers): Step 2 of the next big refactoring project. (23 lines); `c6c1ce6` (2020-08-02, Matt Godbolt): Fix signal handling. (20 lines)",
+    "`update_handler` (36 lines) comes from 5 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (23 lines); `687f6ce` (2025-05-11, snellers): Step 2 of the next big refactoring project. (6 lines); `7a71102` (2020-07-22, Matt Godbolt): Reformat all the code with clang-format (4 lines); `dc2b39c` (2023-09-08, snellers): Implement new solution for collecting garbage Object & Char. This (2 lines)",
+    "`char_update` (167 lines) comes from 39 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (79 lines); `805127b` (2020-08-30, Matt Godbolt): More changes to use AffectList functions directly (18 lines); `e3432e7` (2021-05-18, snellers): C++ifying player char 'conditions' (#256): (6 lines); `794d45b` (2023-09-04, snellers): - char_list takes ownership of all Chars. Replace all remaining naked new/delete! (4 lines)",
+    "`is_immortal` (1 lines) comes from 1 commits; the most: `b1c5588` (2020-08-29, Matt Godbolt): CHAR_DATA -> Char (1 lines)",
+    "`collect_all_garbage` (4 lines) comes from 1 commits; the most: `dc2b39c` (2023-09-08, snellers): Implement new solution for collecting garbage Object & Char. This (4 lines)",
+    "`get_trust` (12 lines) comes from 2 commits; the most: `a484ae5` (2020-08-19, Matt Godbolt): Work in progress on moving functionality into CHAR_DATA (11 lines); `b1c5588` (2020-08-29, Matt Godbolt): CHAR_DATA -> Char (1 lines)",
+    "`is_switched` (1 lines) comes from 1 commits; the most: `c46ee83` (2020-08-09, Matt Godbolt): Extract the CHAR_DATA fields from descriptors (#117) (1 lines)",
+    "Debug builds add `-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined`",
+    "Release builds add `-O2 -DNDEBUG -Wno-error=array-bounds`",
+    "Upstream issue [#218](https://github.com/mattgodbolt/xania/issues/218) (closed): Crash seen in prod in affect_modify (mentions `update_handler`)",
+    "Upstream issue [#182](https://github.com/mattgodbolt/xania/issues/182) (closed): Issues with iterating over lists that are mutated as we go (specifically pets) (mentions `do_quit`)",
+    "Upstream issue [#84](https://github.com/mattgodbolt/xania/issues/84) (closed): save char double free if player directory is not writable (mentions `do_quit`)"
+   ],
+   "questions": [
+    "When did the behaviour start, and why did nobody notice until now?",
+    "Did a toolchain change (compiler, flags, sanitizers) make it show, or change how it shows?",
+    "Has upstream seen or tried this before, and does the change fit what was decided then?"
+   ],
+   "note": ""
+  }
+ ]
+}

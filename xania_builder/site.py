@@ -18,18 +18,19 @@ REPO_URL = "https://github.com/abraidotti/xania-builder"
 # Markdown: the subset the dossiers use -----------------------------------------------------------------------------
 
 def _inline(text: str) -> str:
-    parts = re.split(r"(`[^`]+`)", text)
-    out = []
-    for p in parts:
-        if p.startswith("`") and p.endswith("`") and len(p) > 1:
-            out.append(f"<code>{html.escape(p[1:-1])}</code>")
-            continue
-        p = html.escape(p, quote=False)
-        p = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", lambda m: f'<a href="{_href(m.group(2))}">{m.group(1)}</a>', p)
-        p = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", p)
-        p = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<em>\1</em>", p)
-        out.append(p)
-    return "".join(out)
+    # Code spans first, kept aside as placeholders, so bold, italics and links can wrap them.
+    codes: list[str] = []
+
+    def keep(m: re.Match) -> str:
+        codes.append(f"<code>{html.escape(m.group(1))}</code>")
+        return f"\x00{len(codes) - 1}\x00"
+
+    p = re.sub(r"`([^`]+)`", keep, text)
+    p = html.escape(p, quote=False)
+    p = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", lambda m: f'<a href="{_href(m.group(2))}">{m.group(1)}</a>', p)
+    p = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", p)
+    p = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<em>\1</em>", p)
+    return re.sub(r"\x00(\d+)\x00", lambda m: codes[int(m.group(1))], p)
 
 
 def _href(url: str) -> str:

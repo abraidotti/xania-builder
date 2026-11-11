@@ -89,10 +89,17 @@ class Shell:
         return r.returncode, out
 
 
+# User names seen on this machine (the WSL user, the Windows user): published output never contains them.
+PRIVATE_NAMES: set[str] = {n for n in (os.environ.get("USERNAME", ""), os.environ.get("USER", "")) if len(n) > 2}
+
+
 def redact(text: str) -> str:
-    """Logs get published: home directories become ~."""
+    """Gate output gets published: home directories become ~ and user names become "user"."""
     text = re.sub(r"/home/[^/\s]+", "~", text)
-    return re.sub(r"(?i)[A-Z]:[\\/]Users[\\/][^\\/\s]+", "~", text)
+    text = re.sub(r"(?i)[A-Z]:[\\/]Users[\\/][^\\/\s]+", "~", text)
+    for name in sorted(PRIVATE_NAMES, key=len, reverse=True):
+        text = re.sub(re.escape(name), "user", text, flags=re.I)
+    return text
 
 
 def _tail(text: str, n: int = 40) -> str:
@@ -106,7 +113,7 @@ def parse_junit(xml: str) -> dict[str, str]:
     """{test case (or "case/section"): "pass" | "fail"} from Catch2's JUnit reporter."""
     out: dict[str, str] = {}
     try:
-        root = ET.fromstring(xml)
+        root = ET.fromstring(xml.strip())  # the XML declaration must come first: no leading newline
     except ET.ParseError:
         return out
     for tc in root.iter("testcase"):
@@ -177,7 +184,9 @@ def run(cfg, folder: Path, branch: str, base: str = "", only: set[str] | None = 
                   .splitlines()],
         "stat": _git(src, "diff", "--shortstat", f"{base_sha}..{branch_sha}").strip(),
         "commits": _git(src, "log", "--format=%h %s", f"{base_sha}..{branch_sha}").splitlines(),
-        "new_tests": new_test_cases(diff_tests),
+        # Test cases the diff adds that the base didn't have (an edit next to an old one can show it as added).
+        "new_tests": [t for t in new_test_cases(diff_tests) if t not in set(re.findall(
+            r'TEST_CASE\("([^"]+)"', _git(src, "grep", "-h", "TEST_CASE(", base_sha, "--", "src/test")))],
     }
     work = cfg.gate_dir / g.slug
     work.mkdir(parents=True, exist_ok=True)
@@ -199,6 +208,7 @@ git apply {shlex.quote(wsl_path(work / 'tests.patch'))} 2>&1 || {{ echo "tests.p
 echo "gcc: $(g++-15 --version 2>/dev/null | head -1 || g++ --version | head -1)"
 echo "cmake: $(cmake --version | head -1)"
 echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
+echo "user: $(whoami)"
 """
     code, out = sh.run(prep, timeout=900)
     if code:
@@ -208,6 +218,8 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
         k, _, v = ln.partition(": ")
         if k in ("gcc", "cmake", "os"):
             g.environment[k] = v
+        elif k == "user" and len(v.strip()) > 2:
+            PRIVATE_NAMES.add(v.strip())
     g.environment["distro"] = cfg.wsl_distro
 
     def step(key: str, title: str, expected: str, script: str, timeout: int = 3600) -> Step | None:
@@ -222,6 +234,8 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
         st.data["exit"] = code
         st.data["output"] = out
         g.steps.append(st)
+        # Each step's outcome as it happens, so a log watcher sees progress (the full verdicts print at the end).
+        say(f"    -> {'done' if code == 0 else f'exit {code}'} in {st.seconds:.0f} s")
         return st
 
     # 1. Format
@@ -240,7 +254,8 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
                      f"cd {W}/{where} && make build BUILD_TYPE={mode} 2>&1"
                      + (f" && make install BUILD_TYPE={mode} > /dev/null 2>&1" if mode == "Debug" else ""))
             if b and not b.ok:
-                if where == "base" and "error:" in b.log and "src/test/" in b.log:
+                if (where == "base" and "error:" in b.log and "src/test/" in b.log
+                        and any(s.key == f"build.branch.{lc}" and s.ok for s in g.steps)):
                     # The base is known to build: only the branch's tests were added, so they use something the
                     # change adds. That's not a failure, but the before/after proof has to come from Sim instead.
                     b.ok = None
@@ -251,7 +266,7 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
                     b.detail = "build failed"
                 continue
             if b:
-                b.detail = f"built in {b.seconds:.0f} s"
+                b.detail = "up to date (nothing to rebuild)" if b.seconds < 3 else f"built in {b.seconds:.0f} s"
             xml = f"/tmp/xania-gate-{g.slug}-{where}-{lc}.xml"
             u = step(f"unit.{where}.{lc}", f"Unit tests, {mode}, {label}",
                      "every test passes" if where == "branch" else "the new tests fail here (they pin the bug)",
@@ -280,12 +295,21 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
                 why = re.search(r"Assertion '.*' failed|ERROR: AddressSanitizer: \S+", out)
                 u.detail = (f"aborted: {why.group(0) if why else 'the test binary died'}" if aborted else
                             f"{len(fails)} of {len(cases)} failed" + (f": {', '.join(fails[:4])}" if fails else ""))
+    # If the new tests need the change to compile, the base worktree didn't build, and Sim still needs the base:
+    # build the base exactly as it is (without the branch's tests) for Sim's trials there.
+    if any(s.data.get("needs_change") for s in g.steps) and plan.get("sim"):
+        b = step("build.base-for-sim", "Debug build of the base as it is (for Sim's trials on it)",
+                 "it compiles and installs",
+                 f"cd {W}/base && git checkout -q -f --detach {base_sha} && git clean -qfd src && "
+                 "make build BUILD_TYPE=Debug 2>&1 && make install BUILD_TYPE=Debug > /dev/null 2>&1")
+        if b:
+            b.detail = f"built in {b.seconds:.0f} s" if b.ok else "build failed"
     for st in g.steps:
         st.data.pop("output", None)
 
     if want("before-after") and g.changes["new_tests"]:
         st = Step("before-after", "The new tests, before and after the change",
-                  "each new test fails or aborts on the base in at least one build, and passes on the branch")
+                  expected="each new test fails or aborts on the base in at least one build, and passes on the branch")
         table = []
         ok = True
         for case in g.changes["new_tests"]:
@@ -321,6 +345,7 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
             if not expect or expect == "skip" or not want(f"sim.{n}.{where}"):
                 continue
             st = _sim(cfg, trial, where, expect, f"{W}/{where}", n, say)
+            say(f"    -> {'ok' if st.ok else 'FAIL'}: {st.detail.splitlines()[0] if st.detail else ''}")
             g.steps.append(st)
 
     # A fix needs proof that the bug was there: a new test failing on the base, or Sim seeing it on the base.
@@ -328,7 +353,7 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
     sim_before = [s for s in g.steps if s.key.startswith("sim.") and s.key.endswith(".base")]
     if only is None and (ba is None or ba.ok is None):
         st = Step("before-proof", "Proof the bug was there before the change",
-                  "a new test fails on the base, or a Sim trial shows the bug on the base")
+                  expected="a new test fails on the base, or a Sim trial shows the bug on the base")
         st.ok = any(s.ok for s in sim_before)
         st.detail = ("Sim showed it on the base: " + "; ".join(s.title for s in sim_before if s.ok) if st.ok else
                      "nothing shows the bug on the base: add a test that fails there, or a Sim trial that reproduces it")
@@ -343,7 +368,7 @@ echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"
 def _sim(cfg, trial: dict, where: str, expect: str, checkout: str, n: int, say) -> Step:
     args = [str(a) for a in trial["args"]]
     title = f"Sim `{' '.join(args)}` on the {where}"
-    st = Step(f"sim.{n}.{where}", title, expected={
+    st = Step(f"sim.{n}.{where}", title, expected=trial.get(f"{where}_means") or {
         "reproduces": f"it reproduces `{trial.get('finding', 'a crash')}` (the bug is there)",
         "clean": "it runs and finds no crash", "pass": "the scenario passes", "fail": "the scenario fails"}[expect])
     say(f"  {title} ...")
@@ -410,7 +435,7 @@ def _static(cfg, folder: Path, base_sha: str, branch_sha: str) -> Step:
     from .source import Index
 
     st = Step("static", "Builder's detectors on the focus, base against branch",
-              "no string_view indexed like a C string is left in the focus")
+              expected="no string_view indexed like a C string is left in the focus")
     focus = json.loads((folder / "dossier.json").read_text(encoding="utf-8"))["focus"]
     names = [f["name"] for f in focus["functions"]]
     rows = []
@@ -427,13 +452,15 @@ def _static(cfg, folder: Path, base_sha: str, branch_sha: str) -> Step:
     after = sum(len(r["branch"]) for r in rows)
     st.ok = after == 0 or after < before
     st.detail = f"{before} before, {after} after"
+    if before == after == 0:
+        st.ok, st.detail = None, "doesn't apply: the focus has no string_view indexing, before or after"
     return st
 
 
 def _finish(g: Gate, folder: Path, t0: float) -> Gate:
     g.seconds = round(time.time() - t0, 1)
-    (folder / "gate.json").write_text(json.dumps(g.to_dict(), indent=1), encoding="utf-8")
-    (folder / "gate.md").write_text(markdown(g), encoding="utf-8")
+    (folder / "gate.json").write_text(redact(json.dumps(g.to_dict(), indent=1)), encoding="utf-8")
+    (folder / "gate.md").write_text(redact(markdown(g)), encoding="utf-8")
     return g
 
 

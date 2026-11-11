@@ -1,0 +1,294 @@
+{
+ "schema": 1,
+ "slug": "issue-1-do-get-reads-past-the-end",
+ "branch": "fix/1-do-get-all",
+ "branch_sha": "515b3001abe6211a9042760d7925adeaf046cc5f",
+ "base_sha": "82171fa4434933217c5995dc45ae730c4c635928",
+ "started": 1794412582.5413747,
+ "seconds": 434.2,
+ "environment": {
+  "gcc": "g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "os": "Ubuntu 26.04.1 LTS",
+  "distro": "Ubuntu-26.04"
+ },
+ "changes": {
+  "files": [
+   [
+    "M",
+    "src/act_obj.cpp"
+   ],
+   [
+    "A",
+    "src/test/GetTest.cpp"
+   ]
+  ],
+  "stat": "2 files changed, 170 insertions(+), 13 deletions(-)",
+  "commits": [
+   "515b300 GetTest: a Scene fixture so ~Char doesn't extract stack objects",
+   "73188fc GetTest: allow the mock's logger",
+   "65f1f6e GetTest: test the loot guard through do_get (the helper is file-local)",
+   "a5aeef1 GetTest: Treasure, not Jewelry",
+   "8e58a8d do_get: decide 'all' vs 'all.<name>' once instead of indexing past the end (#1)"
+  ],
+  "new_tests": [
+   "get all and get all.<name> in a room",
+   "get all from an NPC corpse leaves undroppable items unless named"
+  ]
+ },
+ "steps": [
+  {
+   "key": "format",
+   "title": "clang-format (make check-format, as CI)",
+   "ok": true,
+   "expected": "no formatting differences",
+   "detail": "clean",
+   "seconds": 1.8,
+   "log": "~/xania-gate/issue-1-do-get-reads-past-the-end/branch/.tools/clang-format-14 --dry-run -Werror ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Class.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AreaList.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/entity_balance.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ScrollTargetValidator.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/TimeInfoData.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/update.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Learning.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/WrappedFd.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PracticeTabulator.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Char.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Pronouns.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/VnumMobiles.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Shop.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Types.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_obj.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ObjectIndex.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/magic.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProgLoader.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AFFECT_DATA.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/channels.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SkillTables.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Constants.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DescriptorFilter.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/fight.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Help.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ScrollTargetValidator.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DamageMessages.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ObjectType.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Stats.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Finger.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PcCustomization.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SkillsTabulator.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PerEnum.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Stats.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CommandSet.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SectorType.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/string_utils.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Weapon.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/merc.h ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Socials.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Alignment.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/InterpreterImpl.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CharActFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/spec_concordius.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AreaList.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Titles.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/magic2.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/Fd.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/mask_hostname.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/Time.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/Fd.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/BitOps.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/StandardBits.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/Configuration.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/Byte.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/test/ConfigurationTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/test/TimeTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/test/mask_hostname_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/test/main.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/mask_hostname.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/doorman_protocol.h ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/common/Configuration.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Dice.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Visitor.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/handler.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProgImpl.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Channel.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Doorman.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Channel.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/TelnetProtocol.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/test/TelnetProtocolTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/test/IdAllocatorTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/test/main.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Logger.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Doorman.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/TelnetProtocol.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Xania.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Logger.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/Xania.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/IdAllocator.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/IdAllocator.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/doorman/main.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ClanCommFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/clan.h ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Attacks.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Learning.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/lookup.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ArgParser.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/update.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ObjectType.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Worn.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PlayerActFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Finger.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Weapon.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Rng.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/RoomFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/phil.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MobTrig.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/BodyPartFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ResetData.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Direction.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MudImpl.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DamageMessages.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AffectList.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Pronouns.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/InjuredPart.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Note.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MobIndexData.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_move.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/FlagFormat.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_info.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Char.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_info.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/skills.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ExitFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_comm.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Ban.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProg.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Ban.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ride.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/TimeInfoData.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DamageContext.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/db.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AffectList.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Object.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProg.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MobIndexData.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CorpseSummoner.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AFFECT_DATA.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/save.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/BodySize.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Lights.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/skills.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Sex.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/save.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DescriptorList.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Materials.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Duel.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Flag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Area.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PromptFormat.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PromptFormat.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ride.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MudImpl.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SpellTarget.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Sex.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/BodySize.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CorpseSummoner.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/VnumObjects.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Position.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/string_utils_impl.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ArmourClass.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Races.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Class.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Descriptor.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PcNutrition.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MorphologyFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ArgParser.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Descriptor.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/apps/map.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/apps/pfu.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/apps/pfu.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/apps/areas.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/apps/test/pfutest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/apps/test/main.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/apps/pfumain.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/wiznet.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SkillTables.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AffectLocation.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Room.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Act.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Logging.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Direction.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Note.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProgTriggerCtx.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/act_obj_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/CharTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/PracticeTabulatorTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/MProgImplTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/PromptFormatTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/fileutils.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/BodySizeTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/TitlesTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/HelpTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/magic_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/GetTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/WeaponTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/DescriptorTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/PositionTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/DuelTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/ScrollTargetValidatorTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/LoggingTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/FlagTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/SkillsTabulatorTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/CatchFormatters.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/ClassTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/db_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/ObjectTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/AffectListTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/AreaTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/MemFile.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/WearTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/BansTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/TimeInfoDataTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/PronounsTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/HitChanceTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/AFFECT_DATATest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/MockMud.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/DamageMessagesTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/LearningTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/AttacksTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/SectorTypeTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/MaterialsTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/InjuredPartTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/lookup_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/DamageToleranceTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/CommandSetTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/PcNutritionTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/nth_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/MProgLoaderTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/InterpreterImplTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/save_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/DiceTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/MobIndexDataTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/string_utils_test.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/SexTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/MockRng.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/WeatherDataTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/NoteTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/ObjectTypeTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/CorpseSummonerTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/SocialsTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/ArgParserTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/TipsTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/main.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/test/GenericListTest.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ObjectIndex.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ObjectExtraFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ObjectIndexValidator.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/mob_commands.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Tips.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/VnumRooms.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SkillsTabulator.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Races.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/OffensiveFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SkillNumbers.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PracticeTabulator.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Materials.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/HitChance.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/nth.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Logging.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/AffectFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/fight.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Position.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/WeatherData.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Flag.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ExtraDescription.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/clan.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/HitChance.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CommFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Interpreter.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/db.h ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PcData.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/InjuredPart.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Columner.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Attacks.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Tip.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/InterpreterImpl.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/nth.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Dice.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Object.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ContainerFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/WeatherData.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Rng.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_obj.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/PcNutrition.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/string_utils.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Titles.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/healer.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DamageType.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Mud.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DamageTolerance.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_comm.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProgProgram.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_wiz.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DescriptorList.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Socials.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Tips.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_move.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProgImpl.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Format.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/lookup.h ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Tip.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Room.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/special.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProgTypeFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Exit.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Target.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CharExtraFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CharVersion.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/MProgLoader.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Act.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/magic.h ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/SectorType.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/GenericList.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Area.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/handler.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/WeaponFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/act_wiz.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/main.cpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ObjectWearFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Help.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/DamageTolerance.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/Duel.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/WrappedFd.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/ToleranceFlag.hpp ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/src/CharFileMeta.hpp",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "build.branch.debug",
+   "title": "Debug build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 0 s",
+   "seconds": 0.3,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/cmake-build-debug\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.debug",
+   "title": "Unit tests, Debug, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1083 test cases and sections, all passed",
+   "seconds": 3.4,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.20 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   1.93 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1083,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.branch.release",
+   "title": "Release build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 0 s",
+   "seconds": 0.2,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-1-do-get-reads-past-the-end/branch/cmake-build-release\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.release",
+   "title": "Unit tests, Release, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1083 test cases and sections, all passed",
+   "seconds": 0.3,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.02 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   0.11 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1083,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.debug",
+   "title": "Debug build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 10 s",
+   "seconds": 9.7,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-1-do-get-reads-past-the-end/base/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.debug",
+   "title": "Unit tests, Debug, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "aborted: Assertion '__pos < this->_M_len' failed",
+   "seconds": 1.2,
+   "log": "/usr/include/c++/15/string_view:260: constexpr const std::basic_string_view<_CharT, _Traits>::value_type& std::basic_string_view<_CharT, _Traits>::operator[](size_type) const [with _CharT = char; _Traits = std::char_traits<char>; const_reference = const char&; size_type = long unsigned int]: Assertion '__pos < this->_M_len' failed.",
+   "data": {
+    "exit": 134,
+    "cases": 0,
+    "failed": [],
+    "aborted": true
+   }
+  },
+  {
+   "key": "build.base.release",
+   "title": "Release build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 7 s",
+   "seconds": 7.1,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-1-do-get-reads-past-the-end/base/cmake-build-release",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.release",
+   "title": "Unit tests, Release, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "1 of 1083 failed: get all from an NPC corpse leaves undroppable items unless named/get all corpse (autoloot sends the same) takes the bread, refrains from the nodrop and noremove items",
+   "seconds": 0.2,
+   "log": "",
+   "data": {
+    "exit": 42,
+    "cases": 1083,
+    "failed": [
+     "get all from an NPC corpse leaves undroppable items unless named/get all corpse (autoloot sends the same) takes the bread, refrains from the nodrop and noremove items"
+    ],
+    "aborted": false
+   }
+  },
+  {
+   "key": "before-after",
+   "title": "The new tests, before and after the change",
+   "ok": true,
+   "expected": "each new test fails or aborts on the base in at least one build, and passes on the branch",
+   "detail": "2 of 2 new tests pin the fix",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "case": "get all and get all.<name> in a room",
+      "base.debug": "aborted",
+      "base.release": "pass",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "pins the fix"
+     },
+     {
+      "case": "get all from an NPC corpse leaves undroppable items unless named",
+      "base.debug": "aborted",
+      "base.release": "fail",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "pins the fix"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.0.branch",
+   "title": "Sim `smoke` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 21 s",
+   "seconds": 21.6,
+   "log": "smoke: Smoke: create a bot, look, quit (21 s, Xania 515b3001ab)\n  transcript: runs\\20261111-105703\\Smokea.log\n  result: clean",
+   "data": {
+    "measurements": {},
+    "findings": [],
+    "seconds": 21.0,
+    "commit": "515b3001abe6211a9042760d7925adeaf046cc5f",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "Smokea created"
+     },
+     {
+      "ok": true,
+      "summary": "looked around"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.1.base",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k get_all` on the base",
+   "ok": true,
+   "expected": "xania crashes when a bot types 'get all' in an empty room (the known-bug check sees the crash)",
+   "detail": "pytest exit 0: 1 passed, 1 deselected in 38.81s",
+   "seconds": 39.7,
+   "log": ".                                                                        [100%]\n1 passed, 1 deselected in 38.81s",
+   "data": {}
+  },
+  {
+   "key": "sim.1.branch",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k get_all` on the branch",
+   "ok": true,
+   "expected": "xania survives it (the known-bug check reports the bug gone and asks to be retired)",
+   "detail": "pytest exit 1: 1 failed, 1 deselected in 34.89s",
+   "seconds": 35.5,
+   "log": "F                                                                        [100%]\n================================== FAILURES ===================================\n_____________ test_get_all_in_an_empty_room_crashes_debug_builds ______________\nmud = <xania_sim.core.server.TestMud object at 0x000001957D641550>\nnames = <function names.<locals>.<lambda> at 0x000001957F65C3B0>, found = []\n    async def test_get_all_in_an_empty_room_crashes_debug_builds(mud, names, found):\n        \"\"\"act_obj.cpp do_get: 'get all' reads arg1[3] where arg1 is \"all\" (3 chars) when nothing is found (line 648).\n        Each run that still sees it adds an occurrence to the finding (so the dispatch shows it's still there).\"\"\"\n        bot = Bot(names(), \"simpass1\", host=mud.host, port=mud.port)\n        await bot.enter(Profile())\n        crashed = await _crashes_after(mud, bot, \"get all\")\n        report = mud.crash_report() if crashed else \"\"\n        await bot.close()\n        if crashed:\n            found.append(crash_finding(report, 'python -m pytest scenarios/test_live_bugs.py -k get_all',\n                                       \"A bot typed 'get all' in an empty room (a known-bug check).\"))\n            await mud.restart()\n>       assert crashed, \"'get all' no longer crashes xania: the bug looks fixed, retire this test\"\nE       AssertionError: 'get all' no longer crashes xania: the bug looks fixed, retire this test\nE       assert False\nscenarios\\test_live_bugs.py:41: AssertionError\n=========================== short test summary info ===========================\nFAILED scenarios/test_live_bugs.py::test_get_all_in_an_empty_room_crashes_debug_builds\n1 failed, 1 deselected in 34.89s",
+   "data": {}
+  },
+  {
+   "key": "sim.2.branch",
+   "title": "Sim `hunt --minutes 5` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 308 s (fights 16, bot errors 0, crashed False)",
+   "seconds": 309.1,
+   "log": "hunt: Hunt: angry cave beast, 4 bots (308 s, Xania 515b3001ab)\n  fights 16, bot errors 0, crashed False\n  result: clean",
+   "data": {
+    "measurements": {
+     "fights": 16,
+     "bot_errors": 0,
+     "crashed": false
+    },
+    "findings": [],
+    "seconds": 308.4,
+    "commit": "515b3001abe6211a9042760d7925adeaf046cc5f",
+    "outcomes": []
+   }
+  },
+  {
+   "key": "static",
+   "title": "Builder's detectors on the focus, base against branch",
+   "ok": true,
+   "expected": "no string_view indexed like a C string is left in the focus",
+   "detail": "5 before, 0 after",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "function": "loot_and_sacrifice_corpse",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "do_get",
+      "base": [
+       "`arg1[3]` at src/act_obj.cpp:641",
+       "`&arg1[4]` at src/act_obj.cpp:641",
+       "`arg1[3]` at src/act_obj.cpp:648",
+       "`&arg1[4]` at src/act_obj.cpp:651",
+       "`arg1[3]` at src/act_obj.cpp:707"
+      ],
+      "branch": []
+     },
+     {
+      "function": "is_mass_looting_npc_undroppable_obj",
+      "base": [],
+      "branch": []
+     }
+    ]
+   }
+  }
+ ],
+ "error": "",
+ "passed": true,
+ "exit_code": 0
+}

@@ -1,6 +1,6 @@
 # do_get reads past the end of "all": get all / autoloot crash debug builds, skip the undroppable guard in release (#1)
 
-[#1](https://github.com/abraidotti/xania/issues/1) · Xania 82171fa443 · 2026-11-10 11:08
+[#1](https://github.com/abraidotti/xania/issues/1) · Xania 82171fa443 · 2026-11-11 10:11
 
 <details><summary>The idea as given</summary>
 
@@ -10,9 +10,14 @@
 buffer: `arg1[3]` to tell `get all` from `get all.<name>`, and `&arg1[4]` for the name. `arg1` is now a
 `std::string_view`, so for the plain `"all"` (3 characters) `arg1[3]` is out of range.
 
-- **Debug builds abort** on the libstdc++ bounds assertion, taking the whole MUD down.
-- **Release builds** don't crash but read whatever byte follows `all` in the input, so the checks that rely on
-  it are wrong (see Impact).
+- **Debug builds abort** on the libstdc++ bounds assertion, taking the whole MUD down: any `get all` that finds
+  nothing, and every autoloot of a non-empty corpse.
+- **Release builds** don't crash, but `arg1[3]` reads the next byte of the command line instead of a terminator:
+  - `is_mass_looting_npc_undroppable_obj` gets `' '` instead of `'\0'` for `get all corpse`, so the guard against
+    mass-looting undroppable items from NPC corpses (`looting_all_item_dot == '\0'`) **never applies**: `get all
+    corpse` and autoloot take undroppable (`NoDrop`/`NoRemove`) items.
+  - Lines 641/651 work only when the byte after `all` happens to be a NUL, which depends on how the command line
+    is stored.
 
 Present at `82171fa` (current `main` of both this fork and mattgodbolt/xania).
 
@@ -46,7 +51,9 @@ Backtrace for case 2:
 
 Case 1 stops at `do_get ... at src/act_obj.cpp:648`.
 
-## The faulty lines (`src/act_obj.cpp`)
+## Faulty lines
+
+All in `src/act_obj.cpp`:
 
 | Line | Code | Problem when `arg1 == "all"` |
 |---|---|---|
@@ -54,16 +61,6 @@ Case 1 stops at `do_get ... at src/act_obj.cpp:648`.
 | 648 | `if (arg1[3] == '\0')` | out of range; runs whenever nothing was picked up, so an empty room always hits it |
 | 651 | `act("I see no $T here.", ..., &arg1[4], ...)` | `&arg1[4]` is a `const char*` read up to the next NUL, past the end of the view |
 | 707 | `is_mass_looting_npc_undroppable_obj(obj, container, arg1[3])` | out of range for `get all <container>`; for `get all.<name> <container>` the prefix has already been removed (line 688), so `arg1[3]` is the 4th character of the name |
-
-## Impact
-
-- **Debug builds:** any `get all` that finds nothing, and every autoloot of a non-empty corpse, aborts the MUD.
-- **Release builds:** no crash, but `arg1[3]` reads the next byte of the command line instead of a terminator:
-  - `is_mass_looting_npc_undroppable_obj` gets `' '` instead of `'\0'` for `get all corpse`, so the guard against
-    mass-looting undroppable items from NPC corpses (`looting_all_item_dot == '\0'`) **never applies**: `get all
-    corpse` and autoloot take undroppable (`NoDrop`/`NoRemove`) items.
-  - Lines 641/651 work only when the byte after `all` happens to be a NUL, which depends on how the command line
-    is stored.
 
 ## Suggested fix
 
@@ -106,8 +103,10 @@ Tests worth adding (there's `MockMud` in `src/test/`):
 ## How this was found
 
 Bots from [xania-sim](https://github.com/abraidotti/xania-sim) playing a debug build: its test MUD runs xania under
-gdb, and the crash reproduces with `python -m xania_sim hunt --mob "angry cave beast"`. Case 1 was spotted in the code
-next to it and confirmed the same way (a bot typing `get all` in an empty room).
+gdb, and the crash reproduces with `python -m xania_sim hunt --mob "angry cave beast"`. Case 1 was spotted in the
+code next to it and confirmed the same way (a bot typing `get all` in an empty room). A check for it
+(`code.get-all-past-end`) is on its way to Xania Explorer's Bugs page, where it will turn to "fixed" once these
+lines change.
 
 </details>
 
@@ -120,12 +119,12 @@ next to it and confirmed the same way (a bot typing `get all` in an empty room).
 
 ## 1. Explorer insights
 
-- No Explorer bug check, assessment or recommendation touches the focus.
+- Bug check `code.get-all-past-end` (fixed, crash): `get all` and autoloot read past the end of "all". mentions `do_get`, `is_mass_looting_npc_undroppable_obj`
+- Bug check `code.vampiric-integer-drain` (present, wrong-behaviour): Vampiric weapons drain nothing from hits under 100 damage. fight.cpp:718, fight.cpp:719
 
 **To decide**
 
-- [ ] No Explorer code check covers this. Should one be added for the faulty pattern, so other places with it show up and the fix shows as `fixed`?
-- [ ] Should the change also turn an open Explorer bug check to `fixed` (a code check matches the faulty pattern, so the fix should make it disappear)?
+- [ ] The fix should turn the code check above to `fixed` (it matches the faulty pattern). Does it, and are there other occurrences to fix at the same time?
 
 ## 2. Architecture
 
@@ -170,9 +169,11 @@ next to it and confirmed the same way (a bot typing `get all` in an empty room).
 - `do_get` is 115 lines long (src/ median 7).
 - Legacy idioms in `do_get`: '\0' terminator checks
 - Legacy idioms in `is_mass_looting_npc_undroppable_obj`: '\0' terminator checks
+- The same pattern elsewhere in src/ (11 places in 4 functions; each is the same kind of bug unless the view is known to be long enough): `do_who` `arg[0]` :1249; `do_permit` `player[0]` :95, `player[0]` :98; `skill_lookup` `name[0]` :39, `name[0]` :39; `nanny` `argument[0]` :711, `argument[0]` :740, `argument[0]` :762, `argument[0]` :854, `argument[0]` :890, `argument[0]` :915
 
 **To decide**
 
+- [ ] Are the other places with the same pattern the same bug, and do they belong in this change?
 - [ ] What debt does the change pay down while it's here, and what does it deliberately leave?
 - [ ] Does the change add any (a special case, a duplicated check, a new legacy idiom)?
 
@@ -209,18 +210,41 @@ next to it and confirmed the same way (a bot typing `get all` in an empty room).
 - No unit test calls `is_mass_looting_npc_undroppable_obj`.
 - Sim `scenarios/test_live_bugs.py` sends `get`
 - Sim `xania_sim/activities/loot.py` sends `get`
-- Sim finding `crash:SIGABRT:act_obj.cpp:do_get` [new, seen 5x]: xania crashed (SIGABRT, failed assertion) in do_get (act_obj.cpp) (https://github.com/abraidotti/xania/issues/1)
+- Sim finding `crash:SIGABRT:act_obj.cpp:do_get` [known, seen 5x]: xania crashed (SIGABRT, failed assertion) in do_get (act_obj.cpp) (https://github.com/abraidotti/xania/issues/1)
 
 **To decide**
 
 - [ ] Which unit test pins the fixed behaviour (a test that fails before the change)?
 - [ ] Which Sim trial or scenario shows it from a player's side, and should a new one be added?
 
+## 8. History
+
+- `arg1` is declared at src/act_obj.cpp:617, a line last changed in `35c8f3a` (2021-12-03, snellers): get, put, freeze & gain commands upgraded to ArgParser or string_view....
+- `arg1[3]` at src/act_obj.cpp:641 was last changed in `5939d45` (2022-07-04, snellers): Remove can_see_obj().
+- `&arg1[4]` at src/act_obj.cpp:641 was last changed in `5939d45` (2022-07-04, snellers): Remove can_see_obj().
+- `arg1[3]` at src/act_obj.cpp:648 was last changed in `6f770fb` (2021-06-20, snellers): merc.h & xania.cpp cleanup: moving check_material_vulernability(), can_loot(), obj_move_violates_uniqueness() into act_obj.[ch]pp.
+- `&arg1[4]` at src/act_obj.cpp:651 was last changed in `5216c9f` (2020-08-12, Matt Godbolt): act() refactor: introduce a strong type for "To"
+- `arg1[3]` at src/act_obj.cpp:707 was last changed in `5e72201` (2021-04-16, snellers): 'get all corpse' including the autoloot feature no longer auto loots NODROP or NOREMOVE items (NPC corpses only).  Instead the looter and other chars in the room are warned. This is to prevent accidental looting of nodrop/noremove items.
+- The conversion to string_view (or ArgParser): `35c8f3a` (2021-12-03, snellers): get, put, freeze & gain commands upgraded to ArgParser or string_view..... The indexing above has been on a view, with no terminator, since then
+- `loot_and_sacrifice_corpse` (22 lines) comes from 8 commits; the most: `5db75c2` (2020-07-30, snellers): If a pet gets the killing blow, its owner is chosen as the autolooter. Resolves #60 (9 lines); `39ee043` (2021-10-25, snellers): Macro death: convert PLR_ act flags to PlayerActFlag. (6 lines); `35c8f3a` (2021-12-03, snellers): get, put, freeze & gain commands upgraded to ArgParser or string_view.... (2 lines); `b1c5588` (2020-08-29, Matt Godbolt): CHAR_DATA -> Char (1 lines)
+- `do_get` (115 lines) comes from 16 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (41 lines); `35c8f3a` (2021-12-03, snellers): get, put, freeze & gain commands upgraded to ArgParser or string_view.... (17 lines); `6f770fb` (2021-06-20, snellers): merc.h & xania.cpp cleanup: moving check_material_vulernability(), can_loot(), obj_move_violates_uniqueness() into act_obj.[ch]pp. (13 lines); `5216c9f` (2020-08-12, Matt Godbolt): act() refactor: introduce a strong type for "To" (7 lines)
+- `is_mass_looting_npc_undroppable_obj` (4 lines) comes from 4 commits; the most: `e0683fb` (2021-07-03, snellers): merc.h cleanup: move OBJ_DATA to Object.hpp and rename to Object. (1 lines); `49cb513` (2021-07-05, snellers): merc.h cleanup: ITEM_ type defines converted to ObjectType enum.... (1 lines); `88ff199` (2021-07-08, snellers): merc.h cleanup: replace IS_OBJ_STAT macro with object extra checker methods. (1 lines); `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (1 lines)
+- Since 35c8f3a (2021-12-03), 26 commits changed the compiler or its flags; the latest: `7bd8c82` (2026-10-31, snellers): github action upgrade to Ubuntu 26.04 and g++-15; `82823ff` (2026-10-31, snellers): General tooling upgrades, largely for Ubuntu 26.04.1 compatibility conda 26.9.4-0 conan 2.33.0 cmake >= 3.31 g++-15 default, g++-13 fallback Compiles on ubunt 26.04.1; `425fd97` (2025-04-07, snellers): Docker: ubuntu 24 is the default these days. Install clang 19. Stop trying to install awscli as it's not in the ubuntu apt sources now. The session doesn't start tmux by default. [skip ci]; `e5483b6` (2025-03-28, snellers): Update g++ versions in README. Retire the g++ 10/11 toolchains.; `55c9b1b` (2025-03-28, snellers): github: upgrade to ubuntu 24 and use g++-13
+- Debug builds add `-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined`
+- Release builds add `-O2 -DNDEBUG -Wno-error=array-bounds`
+- Upstream issue [#72](https://github.com/mattgodbolt/xania/issues/72) (closed): The autoloot routine loot_and_sacrifice_corpse() has a chance it might target the wrong corpse. (mentions `loot_and_sacrifice_corpse`)
+
+**To decide**
+
+- [ ] When did the behaviour start, and why did nobody notice until now?
+- [ ] Did a toolchain change (compiler, flags, sanitizers) make it show, or change how it shows?
+- [ ] Has upstream seen or tried this before, and does the change fit what was decided then?
+
 ## Gate plan
 
 What `prototype` runs on the fork before this can ship:
 
-- Builds: debug, asan
+- Builds: Debug (ASan, UBSan, LSan, libstdc++ assertions), Release (-O2)
 - Unit tests: `src/test/act_obj_test.cpp`
 - Sim: `smoke`: the game still boots and a player can log in
 - Sim: `hunt --minutes 5`: fights and what runs after a kill (autoloot) reach it

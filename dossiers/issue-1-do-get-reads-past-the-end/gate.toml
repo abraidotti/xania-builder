@@ -1,0 +1,27 @@
+# What `prototype` runs for #1, beyond format, builds and unit tests (always run).
+# Each Sim trial says what it should find on the base (the bug is there) and on the branch (it's gone).
+base = "82171fa"   # main of the fork and of upstream when the issue was filed
+
+[[sim]]
+args = ["smoke"]
+why = "the game still boots and a player can create a character, look and quit"
+branch = "clean"
+
+[[sim]]
+args = ["pytest", "scenarios/test_live_bugs.py", "-k", "get_all"]
+why = "a bot types 'get all' in an empty room. The scenario is a known-bug check: it passes while the crash is there"
+base = "pass"
+base_means = "xania crashes when a bot types 'get all' in an empty room (the known-bug check sees the crash)"
+branch = "fail"
+branch_means = "xania survives it (the known-bug check reports the bug gone and asks to be retired)"
+
+[[sim]]
+args = ["hunt", "--minutes", "5"]
+why = "four level-1 bots fight angry cave beasts in Mud School with autoloot on, so every kill runs 'get all corpse'"
+finding = "do_get"
+# Not a reliable reproducer: the faulty read only happens for a corpse with something in it, and cave beasts rarely
+# carry anything (the first gate run: 16 kills on the base in 5 minutes, no crash). The pytest scenario above is the
+# deterministic proof on the base; this stays as the branch-side check that autoloot after real fights is fine.
+base = "skip"
+branch = "clean"
+timeout = 900

@@ -1,0 +1,313 @@
+{
+ "schema": 1,
+ "slug": "issue-2-quitting-on-a-tick-pulse-char",
+ "branch": "fix/2-extract-char-desc",
+ "branch_sha": "c6aac511eab8103e79a99aae4559ee3966e6c69c",
+ "base_sha": "82171fa4434933217c5995dc45ae730c4c635928",
+ "started": 1794413023.2260823,
+ "seconds": 1105.8,
+ "environment": {
+  "gcc": "g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "os": "Ubuntu 26.04.1 LTS",
+  "distro": "Ubuntu-26.04"
+ },
+ "changes": {
+  "files": [
+   [
+    "M",
+    "src/handler.cpp"
+   ],
+   [
+    "A",
+    "src/test/ExtractCharTest.cpp"
+   ]
+  ],
+  "stat": "2 files changed, 76 insertions(+), 1 deletion(-)",
+  "commits": [
+   "c6aac51 ExtractCharTest: build the Area with Area::parse (its constructor is private)",
+   "9947e43 extract_char: clear ch->desc as well as the descriptor's character (#2)"
+  ],
+  "new_tests": [
+   "extract_char detaches the character from its descriptor both ways"
+  ]
+ },
+ "steps": [
+  {
+   "key": "format",
+   "title": "clang-format (make check-format, as CI)",
+   "ok": true,
+   "expected": "no formatting differences",
+   "detail": "clean",
+   "seconds": 1.8,
+   "log": "~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/.tools/clang-format-14 --dry-run -Werror ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Class.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AreaList.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/entity_balance.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ScrollTargetValidator.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/TimeInfoData.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/update.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Learning.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/WrappedFd.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PracticeTabulator.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Char.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Pronouns.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/VnumMobiles.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Shop.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Types.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_obj.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ObjectIndex.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/magic.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProgLoader.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AFFECT_DATA.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/channels.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SkillTables.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Constants.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DescriptorFilter.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/fight.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Help.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ScrollTargetValidator.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DamageMessages.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ObjectType.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Stats.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Finger.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PcCustomization.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SkillsTabulator.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PerEnum.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Stats.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CommandSet.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SectorType.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/string_utils.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Weapon.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/merc.h ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Socials.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Alignment.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/InterpreterImpl.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CharActFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/spec_concordius.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AreaList.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Titles.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/magic2.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/Fd.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/mask_hostname.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/Time.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/Fd.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/BitOps.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/StandardBits.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/Configuration.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/Byte.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/test/ConfigurationTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/test/TimeTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/test/mask_hostname_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/test/main.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/mask_hostname.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/doorman_protocol.h ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/common/Configuration.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Dice.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Visitor.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/handler.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProgImpl.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Channel.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Doorman.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Channel.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/TelnetProtocol.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/test/TelnetProtocolTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/test/IdAllocatorTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/test/main.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Logger.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Doorman.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/TelnetProtocol.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Xania.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Logger.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/Xania.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/IdAllocator.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/IdAllocator.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/doorman/main.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ClanCommFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/clan.h ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Attacks.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Learning.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/lookup.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ArgParser.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/update.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ObjectType.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Worn.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PlayerActFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Finger.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Weapon.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Rng.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/RoomFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/phil.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MobTrig.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/BodyPartFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ResetData.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Direction.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MudImpl.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DamageMessages.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AffectList.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Pronouns.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/InjuredPart.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Note.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MobIndexData.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_move.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/FlagFormat.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_info.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Char.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_info.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/skills.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ExitFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_comm.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Ban.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProg.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Ban.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ride.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/TimeInfoData.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DamageContext.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/db.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AffectList.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Object.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProg.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MobIndexData.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CorpseSummoner.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AFFECT_DATA.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/save.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/BodySize.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Lights.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/skills.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Sex.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/save.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DescriptorList.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Materials.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Duel.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Flag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Area.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PromptFormat.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PromptFormat.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ride.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MudImpl.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SpellTarget.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Sex.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/BodySize.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CorpseSummoner.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/VnumObjects.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Position.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/string_utils_impl.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ArmourClass.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Races.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Class.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Descriptor.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PcNutrition.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MorphologyFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ArgParser.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Descriptor.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/apps/map.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/apps/pfu.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/apps/pfu.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/apps/areas.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/apps/test/pfutest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/apps/test/main.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/apps/pfumain.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/wiznet.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SkillTables.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AffectLocation.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Room.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Act.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Logging.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Direction.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Note.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProgTriggerCtx.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/act_obj_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/CharTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/PracticeTabulatorTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/MProgImplTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/PromptFormatTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/fileutils.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/BodySizeTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/TitlesTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/HelpTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/magic_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/WeaponTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/DescriptorTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/PositionTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/DuelTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/ScrollTargetValidatorTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/LoggingTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/FlagTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/SkillsTabulatorTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/CatchFormatters.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/ClassTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/db_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/ExtractCharTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/ObjectTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/AffectListTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/AreaTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/MemFile.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/WearTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/BansTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/TimeInfoDataTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/PronounsTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/HitChanceTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/AFFECT_DATATest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/MockMud.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/DamageMessagesTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/LearningTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/AttacksTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/SectorTypeTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/MaterialsTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/InjuredPartTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/lookup_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/DamageToleranceTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/CommandSetTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/PcNutritionTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/nth_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/MProgLoaderTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/InterpreterImplTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/save_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/DiceTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/MobIndexDataTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/string_utils_test.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/SexTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/MockRng.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/WeatherDataTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/NoteTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/ObjectTypeTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/CorpseSummonerTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/SocialsTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/ArgParserTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/TipsTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/main.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/test/GenericListTest.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ObjectIndex.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ObjectExtraFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ObjectIndexValidator.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/mob_commands.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Tips.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/VnumRooms.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SkillsTabulator.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Races.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/OffensiveFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SkillNumbers.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PracticeTabulator.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Materials.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/HitChance.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/nth.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Logging.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/AffectFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/fight.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Position.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/WeatherData.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Flag.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ExtraDescription.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/clan.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/HitChance.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CommFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Interpreter.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/db.h ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PcData.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/InjuredPart.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Columner.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Attacks.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Tip.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/InterpreterImpl.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/nth.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Dice.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Object.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ContainerFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/WeatherData.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Rng.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_obj.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/PcNutrition.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/string_utils.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Titles.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/healer.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DamageType.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Mud.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DamageTolerance.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_comm.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProgProgram.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_wiz.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DescriptorList.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Socials.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Tips.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_move.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProgImpl.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Format.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/lookup.h ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Tip.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Room.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/special.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProgTypeFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Exit.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Target.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CharExtraFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CharVersion.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/MProgLoader.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Act.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/magic.h ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/SectorType.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/GenericList.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Area.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/handler.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/WeaponFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/act_wiz.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/main.cpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ObjectWearFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Help.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/DamageTolerance.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/Duel.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/WrappedFd.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/ToleranceFlag.hpp ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/src/CharFileMeta.hpp",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "build.branch.debug",
+   "title": "Debug build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 23 s",
+   "seconds": 23.4,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.debug",
+   "title": "Unit tests, Debug, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1074 test cases and sections, all passed",
+   "seconds": 3.1,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.08 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   1.54 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1074,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.branch.release",
+   "title": "Release build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 21 s",
+   "seconds": 21.1,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/branch/cmake-build-release",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.release",
+   "title": "Unit tests, Release, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1074 test cases and sections, all passed",
+   "seconds": 0.2,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.00 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   0.06 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1074,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.debug",
+   "title": "Debug build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 20 s",
+   "seconds": 19.9,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/base/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.debug",
+   "title": "Unit tests, Debug, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "1 of 1074 failed: extract_char detaches the character from its descriptor both ways/leaving the world (quit, purge)",
+   "seconds": 1.6,
+   "log": "",
+   "data": {
+    "exit": 42,
+    "cases": 1074,
+    "failed": [
+     "extract_char detaches the character from its descriptor both ways/leaving the world (quit, purge)"
+    ],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.release",
+   "title": "Release build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 21 s",
+   "seconds": 21.0,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-2-quitting-on-a-tick-pulse-char/base/cmake-build-release",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.release",
+   "title": "Unit tests, Release, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "1 of 1074 failed: extract_char detaches the character from its descriptor both ways/leaving the world (quit, purge)",
+   "seconds": 0.2,
+   "log": "",
+   "data": {
+    "exit": 42,
+    "cases": 1074,
+    "failed": [
+     "extract_char detaches the character from its descriptor both ways/leaving the world (quit, purge)"
+    ],
+    "aborted": false
+   }
+  },
+  {
+   "key": "before-after",
+   "title": "The new tests, before and after the change",
+   "ok": true,
+   "expected": "each new test fails or aborts on the base in at least one build, and passes on the branch",
+   "detail": "1 of 1 new tests pin the fix",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "case": "extract_char detaches the character from its descriptor both ways",
+      "base.debug": "fail",
+      "base.release": "fail",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "pins the fix"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.0.branch",
+   "title": "Sim `smoke` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 21 s",
+   "seconds": 21.8,
+   "log": "smoke: Smoke: create a bot, look, quit (21 s, Xania c6aac511ea)\n  transcript: runs\\20261111-110532\\Smokea.log\n  result: clean",
+   "data": {
+    "measurements": {},
+    "findings": [],
+    "seconds": 21.1,
+    "commit": "c6aac511eab8103e79a99aae4559ee3966e6c69c",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "Smokea created"
+     },
+     {
+      "ok": true,
+      "summary": "looked around"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.1.base",
+   "title": "Sim `churn --bots 6 --minutes 15` on the base",
+   "ok": true,
+   "expected": "it reproduces `heap-use-after-free` (the bug is there)",
+   "detail": "reproduced: xania crashed (AddressSanitizer: heap-use-after-free) in Descriptor::is_switched (Descriptor.hpp)",
+   "seconds": 68.3,
+   "log": "churn: Churn: 6 bots creating and quitting (68 s, Xania 82171fa443)\n  quits 42, bot errors 0, crashed True\n  [known] high xania crashed (AddressSanitizer: heap-use-after-free) in Descriptor::is_switched (Descriptor.hpp)\n  crash_report: runs\\churn-20261111-110538\\xania-crash.txt\n  result: clean",
+   "data": {
+    "measurements": {
+     "quits": 42,
+     "bot_errors": 0,
+     "crashed": true
+    },
+    "findings": [
+     {
+      "signature": "crash:asan-heap-use-after-free:Descriptor.hpp:Descriptor::is_switched",
+      "title": "xania crashed (AddressSanitizer: heap-use-after-free) in Descriptor::is_switched (Descriptor.hpp)",
+      "status": "known"
+     }
+    ],
+    "seconds": 67.7,
+    "commit": "82171fa4434933217c5995dc45ae730c4c635928"
+   }
+  },
+  {
+   "key": "sim.1.branch",
+   "title": "Sim `churn --bots 6 --minutes 15` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 912 s (quits 1260, bot errors 0, crashed False)",
+   "seconds": 912.8,
+   "log": "churn: Churn: 6 bots creating and quitting (912 s, Xania c6aac511ea)\n  quits 1260, bot errors 0, crashed False\n  result: clean",
+   "data": {
+    "measurements": {
+     "quits": 1260,
+     "bot_errors": 0,
+     "crashed": false
+    },
+    "findings": [],
+    "seconds": 912.1,
+    "commit": "c6aac511eab8103e79a99aae4559ee3966e6c69c",
+    "outcomes": []
+   }
+  },
+  {
+   "key": "static",
+   "title": "Builder's detectors on the focus, base against branch",
+   "ok": true,
+   "expected": "no string_view indexed like a C string is left in the focus",
+   "detail": "0 before, 0 after",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "function": "do_quit",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "extract_char",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "MudImpl::game_loop",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "update_handler",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "char_update",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "Char::is_immortal",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "collect_all_garbage",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "Char::get_trust",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "is_switched",
+      "base": [],
+      "branch": []
+     }
+    ]
+   }
+  }
+ ],
+ "error": "",
+ "passed": true,
+ "exit_code": 0
+}
