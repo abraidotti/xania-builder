@@ -21,11 +21,11 @@ def _say(msg: str) -> None:
     print(msg, file=sys.stderr)
 
 
-def _load_world(cfg):
+def _load_world(cfg, root=None):
     cfg.use_explorer()
     from xania_explorer.api import load_world
 
-    return load_world(cfg.source)
+    return load_world(root or cfg.source)
 
 
 def doctor(cfg, as_json: bool) -> int:
@@ -98,18 +98,6 @@ def research(cfg, args) -> int:
     if not cfg.src.exists():
         _say(f"COULDN'T RUN: no Xania source at {cfg.source} (see `doctor`)")
         return 2
-    world = None
-    world_error = ""
-    if not args.no_explorer:
-        try:
-            world = _load_world(cfg)
-        except Exception as e:  # noqa: BLE001
-            world_error = f"{type(e).__name__}: {e}"
-    try:
-        idea = idea_mod.resolve(args.idea, cfg, (lambda: world) if world is not None else None)
-    except idea_mod.IdeaError as e:
-        _say(f"COULDN'T RUN: {e}")
-        return 2
     root, at = cfg.source, ""
     if args.at:
         try:
@@ -117,6 +105,20 @@ def research(cfg, args) -> int:
         except RuntimeError as e:
             _say(f"COULDN'T RUN: {e}")
             return 2
+    world = None
+    world_error = ""
+    if not args.no_explorer:
+        try:
+            # Explorer reads the same code as the rest of the research: with --at, the base, not the checkout
+            # (which may already be on the fix, and would report the bug checks as fixed).
+            world = _load_world(cfg, root)
+        except Exception as e:  # noqa: BLE001
+            world_error = f"{type(e).__name__}: {e}"
+    try:
+        idea = idea_mod.resolve(args.idea, cfg, (lambda: world) if world is not None else None)
+    except idea_mod.IdeaError as e:
+        _say(f"COULDN'T RUN: {e}")
+        return 2
     ix = Index(root)
     fo = idea_mod.focus(idea, ix, args.symbol or [], args.file or [], args.command or [])
     d = research_mod.build(idea, fo, ix, cfg, world, at)

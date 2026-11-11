@@ -97,7 +97,6 @@ The new tests on the code **before** the change (the branch's tests applied to t
 ## Not in this PR
 
 - Xania Sim: retire `test_get_all_in_an_empty_room_crashes_debug_builds` once this is merged (it asks to be).
-- Xania Explorer: the `code.get-all-past-end` check.
 - Builder: teach the string_view detector about `empty()` guards (2 false positives here).
 - Check the `practice ''` lead with Sim.
 

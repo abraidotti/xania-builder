@@ -1,6 +1,6 @@
 # do_get reads past the end of "all": get all / autoloot crash debug builds, skip the undroppable guard in release (#1)
 
-[#1](https://github.com/abraidotti/xania/issues/1) · Xania 82171fa443 · 2026-11-11 10:11
+[#1](https://github.com/abraidotti/xania/issues/1) · Xania 82171fa443 · 2026-11-11 14:10
 
 <details><summary>The idea as given</summary>
 
@@ -119,7 +119,7 @@ lines change.
 
 ## 1. Explorer insights
 
-- Bug check `code.get-all-past-end` (fixed, crash): `get all` and autoloot read past the end of "all". mentions `do_get`, `is_mass_looting_npc_undroppable_obj`
+- Bug check `code.get-all-past-end` (present, crash): `get all` and autoloot read past the end of "all". act_obj.cpp:641, act_obj.cpp:641, act_obj.cpp:648, act_obj.cpp:651, act_obj.cpp:707
 - Bug check `code.vampiric-integer-drain` (present, wrong-behaviour): Vampiric weapons drain nothing from hits under 100 damage. fight.cpp:718, fight.cpp:719
 
 **To decide**
@@ -210,7 +210,7 @@ lines change.
 - No unit test calls `is_mass_looting_npc_undroppable_obj`.
 - Sim `scenarios/test_live_bugs.py` sends `get`
 - Sim `xania_sim/activities/loot.py` sends `get`
-- Sim finding `crash:SIGABRT:act_obj.cpp:do_get` [known, seen 5x]: xania crashed (SIGABRT, failed assertion) in do_get (act_obj.cpp) (https://github.com/abraidotti/xania/issues/1)
+- Sim finding `crash:SIGABRT:act_obj.cpp:do_get` [known, seen 9x]: xania crashed (SIGABRT, failed assertion) in do_get (act_obj.cpp) (https://github.com/abraidotti/xania/issues/1)
 
 **To decide**
 
@@ -232,6 +232,7 @@ lines change.
 - Since 35c8f3a (2021-12-03), 26 commits changed the compiler or its flags; the latest: `7bd8c82` (2026-10-31, snellers): github action upgrade to Ubuntu 26.04 and g++-15; `82823ff` (2026-10-31, snellers): General tooling upgrades, largely for Ubuntu 26.04.1 compatibility conda 26.9.4-0 conan 2.33.0 cmake >= 3.31 g++-15 default, g++-13 fallback Compiles on ubunt 26.04.1; `425fd97` (2025-04-07, snellers): Docker: ubuntu 24 is the default these days. Install clang 19. Stop trying to install awscli as it's not in the ubuntu apt sources now. The session doesn't start tmux by default. [skip ci]; `e5483b6` (2025-03-28, snellers): Update g++ versions in README. Retire the g++ 10/11 toolchains.; `55c9b1b` (2025-03-28, snellers): github: upgrade to ubuntu 24 and use g++-13
 - Debug builds add `-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined`
 - Release builds add `-O2 -DNDEBUG -Wno-error=array-bounds`
+- Upstream PR [#307](https://github.com/mattgodbolt/xania/pull/307) (open): do_get: decide 'all' vs 'all.<name>' once instead of indexing past the end (mentions `do_get`, `is_mass_looting_npc_undroppable_obj`)
 - Upstream issue [#72](https://github.com/mattgodbolt/xania/issues/72) (closed): The autoloot routine loot_and_sacrifice_corpse() has a chance it might target the wrong corpse. (mentions `loot_and_sacrifice_corpse`)
 
 **To decide**

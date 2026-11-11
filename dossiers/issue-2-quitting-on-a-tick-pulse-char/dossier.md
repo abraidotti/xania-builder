@@ -1,6 +1,6 @@
 # Quitting on a tick pulse: char_update reads a freed Descriptor (use-after-free) (#2)
 
-[#2](https://github.com/abraidotti/xania/issues/2) · Xania 82171fa443 · 2026-11-11 10:16
+[#2](https://github.com/abraidotti/xania/issues/2) · Xania 82171fa443 · 2026-11-11 14:10
 
 <details><summary>The idea as given</summary>
 
@@ -96,6 +96,7 @@ end of each level.
 
 ## 1. Explorer insights
 
+- Bug check `code.lobby-empty-reply` (present, crash): An empty reply at a login prompt crashes debug builds. MudImpl.cpp:711, MudImpl.cpp:740, MudImpl.cpp:854, MudImpl.cpp:890, MudImpl.cpp:915
 - Bug check `code.lose-level-asymmetry` (present, wrong-behaviour): Losing a level doesn't undo what gaining it gave. update.cpp:480, update.cpp:539
 
 **To decide**
@@ -275,6 +276,7 @@ end of each level.
 - `is_switched` (1 lines) comes from 1 commits; the most: `c46ee83` (2020-08-09, Matt Godbolt): Extract the CHAR_DATA fields from descriptors (#117) (1 lines)
 - Debug builds add `-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined`
 - Release builds add `-O2 -DNDEBUG -Wno-error=array-bounds`
+- Upstream PR [#309](https://github.com/mattgodbolt/xania/pull/309) (open): extract_char: clear ch->desc as well as the descriptor's character (mentions `do_quit`, `extract_char`, `update_handler`)
 - Upstream issue [#218](https://github.com/mattgodbolt/xania/issues/218) (closed): Crash seen in prod in affect_modify (mentions `update_handler`)
 - Upstream issue [#182](https://github.com/mattgodbolt/xania/issues/182) (closed): Issues with iterating over lists that are mutated as we go (specifically pets) (mentions `do_quit`)
 - Upstream issue [#84](https://github.com/mattgodbolt/xania/issues/84) (closed): save char double free if player directory is not writable (mentions `do_quit`)

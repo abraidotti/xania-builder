@@ -92,7 +92,6 @@ The new tests on the code **before** the change (the branch's tests applied to t
 
 ## Not in this PR
 
-- Xania Explorer: the `code.lobby-empty-reply` check.
 - Xania Sim: a reconnect trial (restart xania under a live doorman with a character logged in twice) to confirm the second path.
 - Builder: teach the detector about `empty()` guards (it flags line 762 and two other guarded places).
 

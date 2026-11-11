@@ -94,8 +94,8 @@ comments that say what "all" and the guard mean.
 
 ## Answers to the dossier's questions
 
-**1. Explorer.** No Explorer check covers this. One is proposed (`code.get-all-past-end`) so Explorer's Bugs page
-shows it as fixed once this lands; it isn't part of this PR (Explorer is a separate tool).
+**1. Explorer.** Xania Explorer's Bugs page has a check for this pattern (`code.get-all-past-end`), added while the
+issue was filed; it lists the faulty lines in `do_get` and will show them as fixed once this is merged.
 
 **2. Architecture.** The change is local to `do_get` and its file-local helper. The only automatic caller,
 `loot_and_sacrifice_corpse` (autoloot), passes `"all corpse"` and now gets the behaviour `5e72201` intended. No
@@ -138,6 +138,5 @@ different autoloot bug, closed).
 ## Follow-ups (not in this PR)
 
 - Xania Sim: retire `test_get_all_in_an_empty_room_crashes_debug_builds` once this is merged (it asks to be).
-- Xania Explorer: the `code.get-all-past-end` check.
 - Builder: teach the string_view detector about `empty()` guards (2 false positives here).
 - Check the `practice ''` lead with Sim.

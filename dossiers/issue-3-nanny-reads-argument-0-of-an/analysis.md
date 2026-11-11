@@ -92,8 +92,9 @@ That's what the C version did before `03e4dc4`, so the behaviour is restored, no
 
 ## Answers to the dossier's questions
 
-**1. Explorer.** No Explorer check covers this yet; `code.lobby-empty-reply` is proposed (separate tool, separate
-change), which would list any of the five lines still indexing `argument[0]`.
+**1. Explorer.** Xania Explorer's Bugs page has a check for this (`code.lobby-empty-reply`), added when the issue
+was filed; it lists any of the five prompts still indexing `argument[0]`, and will show them as fixed once this is
+merged.
 
 **2. Architecture.** Local to `MudImpl::nanny`, plus a header-only helper. Every caller of `nanny` benefits: the
 game loop (player input) and both doorman reconnect calls.
@@ -126,7 +127,6 @@ upstream #129 (closed, "Splat in reconnect") and upstream #178 (open) are about 
 
 ## Follow-ups (not in this PR)
 
-- Xania Explorer: the `code.lobby-empty-reply` check.
 - Xania Sim: a reconnect trial (restart xania under a live doorman with a character logged in twice) to confirm the
   second path.
 - Builder: teach the detector about `empty()` guards (it flags line 762 and two other guarded places).

@@ -1,6 +1,6 @@
 # nanny reads argument[0] of an empty reply at five lobby prompts (debug builds abort) (#3)
 
-[#3](https://github.com/abraidotti/xania/issues/3) · Xania 82171fa443 · 2026-11-11 10:11
+[#3](https://github.com/abraidotti/xania/issues/3) · Xania 82171fa443 · 2026-11-11 14:10
 
 <details><summary>The idea as given</summary>
 
@@ -178,11 +178,11 @@ page, where it will list any of the five lines still unfixed.
 - Since 03e4dc4 (2021-12-05), 26 commits changed the compiler or its flags; the latest: `7bd8c82` (2026-10-31, snellers): github action upgrade to Ubuntu 26.04 and g++-15; `82823ff` (2026-10-31, snellers): General tooling upgrades, largely for Ubuntu 26.04.1 compatibility conda 26.9.4-0 conan 2.33.0 cmake >= 3.31 g++-15 default, g++-13 fallback Compiles on ubunt 26.04.1; `425fd97` (2025-04-07, snellers): Docker: ubuntu 24 is the default these days. Install clang 19. Stop trying to install awscli as it's not in the ubuntu apt sources now. The session doesn't start tmux by default. [skip ci]; `e5483b6` (2025-03-28, snellers): Update g++ versions in README. Retire the g++ 10/11 toolchains.; `55c9b1b` (2025-03-28, snellers): github: upgrade to ubuntu 24 and use g++-13
 - Debug builds add `-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined`
 - Release builds add `-O2 -DNDEBUG -Wno-error=array-bounds`
+- Upstream PR [#308](https://github.com/mattgodbolt/xania/pull/308) (open): nanny: an empty reply at a Y/N-style lobby prompt asks again instead of reading past the end (mentions `nanny`, `pop_incomm`)
 - Upstream issue [#280](https://github.com/mattgodbolt/xania/issues/280) (closed): Duplicate characters during char creation (mentions `nanny`)
 - Upstream issue [#279](https://github.com/mattgodbolt/xania/issues/279) (open): Breakup & refactor nanny() (mentions `nanny`)
 - Upstream issue [#129](https://github.com/mattgodbolt/xania/issues/129) (closed): Splat in reconnect (mentions `nanny`)
 - Upstream issue [#127](https://github.com/mattgodbolt/xania/issues/127) (closed): Heap use after free in xania (mentions `nanny`)
-- Upstream issue [#38](https://github.com/mattgodbolt/xania/issues/38) (closed): MUD should time out inactive connections pre-Play (mentions `nanny`)
 
 **To decide**
 
