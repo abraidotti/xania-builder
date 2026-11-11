@@ -85,3 +85,54 @@ def test_history_blames_flagged_lines(checkout, cfg):
     assert any("`arg1[3]` at src/act_obj.cpp:16 was last changed in" in f and "Ann" in f and "string_view" in f
                for f in h.facts)
     assert any(f.startswith("`do_get`") and "1 commits" in f for f in h.facts)
+
+
+def test_string_view_detector_guards_and_comments(tmp_path):
+    import textwrap
+
+    (tmp_path / "src").mkdir()
+    (tmp_path / "src" / "a.cpp").write_text(textwrap.dedent('''\
+        int lookup(std::string_view name) {
+            // name[0] in a comment doesn't count
+            if (name.empty())
+                return -1;
+            return name[0];
+        }
+        void do_get(Char *ch, ArgParser args) {
+            auto arg1 = args.shift();
+            if (arg1.empty())
+                return;
+            if (arg1[3] == '\0')
+                return;
+        }
+        void nanny(std::string_view argument) {
+            switch (state) {
+            case 1:
+                if (argument.empty()) break;
+                use(argument[0]);
+                break;
+            case 2:
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                filler();
+                use(argument[0]);
+            }
+        }
+        '''), encoding="utf-8")
+    ix = Index(tmp_path)
+    by = {fn.short: [w for w, _, _ in research.string_view_hits(ix, fn)] for fn in ix.functions}
+    assert by["lookup"] == []                      # guarded [0], and the comment is ignored
+    assert by["do_get"] == ["`arg1[3]`"]           # empty() doesn't make [3] safe
+    assert by["nanny"] == ["`argument[0]`"]        # the guard in case 1 is too far from case 2's [0]
+    assert len(research.string_view_hits(ix, [f for f in ix.functions if f.short == "lookup"][0], guarded=True)) == 1

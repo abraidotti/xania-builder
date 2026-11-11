@@ -1,0 +1,29 @@
+# What `prototype` runs for #7, beyond format, builds and unit tests (always run).
+base = "82171fa"   # main of the fork and of upstream when the issue was filed
+
+[[sim]]
+args = ["smoke"]
+why = "the game still boots and a player can create a character, look and quit"
+branch = "clean"
+
+[[sim]]
+args = ["pytest", "scenarios/test_live_bugs.py", "-k", "practice_empty"]
+why = "a new character walks to the nearest trainer, practises once (proving the trainer is there), then types practice ''"
+base = "pass"
+base_means = "xania crashes in skill_lookup (the known-bug check sees the crash)"
+branch = "fail"
+branch_means = "xania answers \"You can't practice that.\" and survives (the known-bug check reports the bug gone)"
+
+[[sim]]
+args = ["pytest", "scenarios/test_live_bugs.py", "-k", "cast_empty"]
+why = "the same bug through do_cast, found while checking skill_lookup's callers: a new character types cast '' anywhere"
+base = "pass"
+base_means = "xania crashes in skill_lookup via do_cast (the known-bug check sees the crash)"
+branch = "fail"
+branch_means = "xania survives cast '' (the known-bug check reports the bug gone)"
+
+[[sim]]
+args = ["skill", "bash", "--classes", "knight", "--fights", "2"]
+why = "practising and using a skill end to end still works with the new check in skill_lookup (practice, then fights)"
+branch = "clean"
+timeout = 900

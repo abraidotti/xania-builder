@@ -54,7 +54,7 @@ Then it writes seven sections. Each one has **facts** it gathered and **question
 | 1. Explorer insights | Bug checks whose occurrences or text touch the focus; the assessments that read the same files, their main findings and code recommendations |
 | 2. Architecture | Where each function is, the commands it handles (and from which position), its callers (including ones no player types, like autoloot), what it calls, any persisted state it reaches |
 | 3. Design patterns | The idioms in each function against the codebase (`ArgParser`, `string_view`, `matches()`, `act()` vs `char` buffers, `sprintf`, `'\0'` checks), helpers it already has, functions of the same shape nearby |
-| 4. Technical debt | `string_view`s indexed like C strings, long functions, legacy idioms, TODO/FIXME marks |
+| 4. Technical debt | `string_view`s indexed like C strings (a `[0]` with the same view's `empty()` tested in the 15 lines before it counts as guarded; comments don't count; a guard on something else, like `args.empty()` before `args.shift()[0]`, isn't seen), long functions, legacy idioms, TODO/FIXME marks, and the same pattern anywhere else in `src/` |
 | 5. Gameplay | How players reach it, what runs it automatically, the messages it can show, whether Explorer's balance numbers depend on it |
 | 6. Documentation | Help entries for the commands and ones that mention the functions; docs in the checkout |
 | 7. Test coverage | Unit test files for the touched files (by name, include or mention), functions no test calls, Sim scenarios that send the commands, Sim findings about the functions |

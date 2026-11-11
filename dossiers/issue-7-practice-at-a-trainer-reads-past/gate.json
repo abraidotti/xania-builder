@@ -1,0 +1,334 @@
+{
+ "schema": 1,
+ "slug": "issue-7-practice-at-a-trainer-reads-past",
+ "branch": "fix/7-practice-empty",
+ "branch_sha": "9c1d338865d5a586f5b6d7dd5920657e011cad9a",
+ "base_sha": "82171fa4434933217c5995dc45ae730c4c635928",
+ "started": 1794429095.1410146,
+ "seconds": 453.3,
+ "environment": {
+  "gcc": "g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "os": "Ubuntu 26.04.1 LTS",
+  "distro": "Ubuntu-26.04"
+ },
+ "changes": {
+  "files": [
+   [
+    "M",
+    "src/lookup.cpp"
+   ],
+   [
+    "M",
+    "src/test/lookup_test.cpp"
+   ]
+  ],
+  "stat": "2 files changed, 16 insertions(+)",
+  "commits": [
+   "9c1d338 skill_lookup: an empty name matches nothing instead of reading past the end"
+  ],
+  "new_tests": [
+   "an empty skill name matches nothing"
+  ]
+ },
+ "steps": [
+  {
+   "key": "format",
+   "title": "clang-format (make check-format, as CI)",
+   "ok": true,
+   "expected": "no formatting differences",
+   "detail": "clean",
+   "seconds": 1.7,
+   "log": "~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/.tools/clang-format-14 --dry-run -Werror ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Class.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AreaList.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/entity_balance.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ScrollTargetValidator.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/TimeInfoData.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/update.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Learning.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/WrappedFd.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PracticeTabulator.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Char.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Pronouns.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/VnumMobiles.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Shop.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Types.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_obj.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ObjectIndex.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/magic.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProgLoader.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AFFECT_DATA.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/channels.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SkillTables.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Constants.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DescriptorFilter.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/fight.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Help.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ScrollTargetValidator.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DamageMessages.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ObjectType.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Stats.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Finger.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PcCustomization.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SkillsTabulator.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PerEnum.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Stats.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CommandSet.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SectorType.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/string_utils.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Weapon.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/merc.h ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Socials.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Alignment.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/InterpreterImpl.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CharActFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/spec_concordius.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AreaList.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Titles.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/magic2.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/Fd.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/mask_hostname.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/Time.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/Fd.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/BitOps.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/StandardBits.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/Configuration.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/Byte.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/test/ConfigurationTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/test/TimeTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/test/mask_hostname_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/test/main.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/mask_hostname.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/doorman_protocol.h ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/common/Configuration.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Dice.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Visitor.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/handler.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProgImpl.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Channel.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Doorman.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Channel.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/TelnetProtocol.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/test/TelnetProtocolTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/test/IdAllocatorTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/test/main.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Logger.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Doorman.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/TelnetProtocol.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Xania.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Logger.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/Xania.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/IdAllocator.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/IdAllocator.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/doorman/main.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ClanCommFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/clan.h ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Attacks.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Learning.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/lookup.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ArgParser.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/update.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ObjectType.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Worn.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PlayerActFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Finger.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Weapon.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Rng.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/RoomFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/phil.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MobTrig.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/BodyPartFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ResetData.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Direction.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MudImpl.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DamageMessages.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AffectList.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Pronouns.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/InjuredPart.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Note.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MobIndexData.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_move.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/FlagFormat.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_info.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Char.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_info.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/skills.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ExitFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_comm.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Ban.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProg.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Ban.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ride.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/TimeInfoData.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DamageContext.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/db.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AffectList.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Object.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProg.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MobIndexData.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CorpseSummoner.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AFFECT_DATA.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/save.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/BodySize.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Lights.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/skills.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Sex.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/save.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DescriptorList.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Materials.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Duel.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Flag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Area.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PromptFormat.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PromptFormat.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ride.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MudImpl.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SpellTarget.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Sex.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/BodySize.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CorpseSummoner.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/VnumObjects.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Position.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/string_utils_impl.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ArmourClass.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Races.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Class.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Descriptor.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PcNutrition.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MorphologyFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ArgParser.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Descriptor.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/apps/map.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/apps/pfu.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/apps/pfu.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/apps/areas.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/apps/test/pfutest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/apps/test/main.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/apps/pfumain.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/wiznet.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SkillTables.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AffectLocation.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Room.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Act.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Logging.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Direction.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Note.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProgTriggerCtx.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/act_obj_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/CharTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/PracticeTabulatorTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/MProgImplTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/PromptFormatTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/fileutils.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/BodySizeTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/TitlesTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/HelpTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/magic_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/WeaponTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/DescriptorTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/PositionTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/DuelTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/ScrollTargetValidatorTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/LoggingTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/FlagTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/SkillsTabulatorTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/CatchFormatters.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/ClassTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/db_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/ObjectTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/AffectListTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/AreaTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/MemFile.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/WearTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/BansTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/TimeInfoDataTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/PronounsTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/HitChanceTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/AFFECT_DATATest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/MockMud.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/DamageMessagesTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/LearningTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/AttacksTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/SectorTypeTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/MaterialsTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/InjuredPartTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/lookup_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/DamageToleranceTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/CommandSetTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/PcNutritionTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/nth_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/MProgLoaderTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/InterpreterImplTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/save_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/DiceTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/MobIndexDataTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/string_utils_test.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/SexTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/MockRng.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/WeatherDataTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/NoteTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/ObjectTypeTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/CorpseSummonerTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/SocialsTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/ArgParserTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/TipsTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/main.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/test/GenericListTest.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ObjectIndex.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ObjectExtraFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ObjectIndexValidator.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/mob_commands.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Tips.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/VnumRooms.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SkillsTabulator.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Races.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/OffensiveFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SkillNumbers.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PracticeTabulator.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Materials.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/HitChance.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/nth.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Logging.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/AffectFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/fight.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Position.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/WeatherData.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Flag.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ExtraDescription.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/clan.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/HitChance.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CommFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Interpreter.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/db.h ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PcData.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/InjuredPart.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Columner.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Attacks.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Tip.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/InterpreterImpl.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/nth.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Dice.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Object.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ContainerFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/WeatherData.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Rng.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_obj.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/PcNutrition.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/string_utils.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Titles.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/healer.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DamageType.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Mud.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DamageTolerance.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_comm.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProgProgram.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_wiz.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DescriptorList.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Socials.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Tips.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_move.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProgImpl.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Format.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/lookup.h ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Tip.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Room.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/special.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProgTypeFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Exit.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Target.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CharExtraFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CharVersion.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/MProgLoader.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Act.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/magic.h ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/SectorType.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/GenericList.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Area.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/handler.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/WeaponFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/act_wiz.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/main.cpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ObjectWearFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Help.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/DamageTolerance.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/Duel.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/WrappedFd.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/ToleranceFlag.hpp ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/src/CharFileMeta.hpp",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "build.branch.debug",
+   "title": "Debug build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 0.3,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/cmake-build-debug\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.debug",
+   "title": "Unit tests, Debug, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1072 test cases and sections, all passed",
+   "seconds": 3.4,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.20 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   1.97 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1072,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.branch.release",
+   "title": "Release build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 0.2,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-7-practice-at-a-trainer-reads-past/branch/cmake-build-release\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.release",
+   "title": "Unit tests, Release, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1072 test cases and sections, all passed",
+   "seconds": 0.3,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.02 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   0.11 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1072,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.debug",
+   "title": "Debug build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 6 s",
+   "seconds": 5.7,
+   "log": "/usr/bin/cmake --build ~/xania-gate/_base-82171fa44349/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.debug",
+   "title": "Unit tests, Debug, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "aborted: Assertion '__pos < this->_M_len' failed",
+   "seconds": 1.2,
+   "log": "/usr/include/c++/15/string_view:260: constexpr const std::basic_string_view<_CharT, _Traits>::value_type& std::basic_string_view<_CharT, _Traits>::operator[](size_type) const [with _CharT = char; _Traits = std::char_traits<char>; const_reference = const char&; size_type = long unsigned int]: Assertion '__pos < this->_M_len' failed.",
+   "data": {
+    "exit": 134,
+    "cases": 0,
+    "failed": [],
+    "aborted": true
+   }
+  },
+  {
+   "key": "build.base.release",
+   "title": "Release build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 3 s",
+   "seconds": 3.2,
+   "log": "/usr/bin/cmake --build ~/xania-gate/_base-82171fa44349/cmake-build-release",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.release",
+   "title": "Unit tests, Release, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "aborted: SIGSEGV (a segfault)",
+   "seconds": 0.2,
+   "log": "",
+   "data": {
+    "exit": 139,
+    "cases": 0,
+    "failed": [],
+    "aborted": true
+   }
+  },
+  {
+   "key": "before-after",
+   "title": "The new tests, before and after the change",
+   "ok": true,
+   "expected": "each new test fails or aborts on the base in at least one build, and passes on the branch",
+   "detail": "1 of 1 new tests pin the fix",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "case": "an empty skill name matches nothing",
+      "base.debug": "aborted",
+      "base.release": "aborted",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "pins the fix"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.0.branch",
+   "title": "Sim `smoke` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 21 s",
+   "seconds": 21.6,
+   "log": "smoke: Smoke: create a bot, look, quit (21 s, Xania 9c1d338865)\n  transcript: runs\\20261111-153208\\Smokea.log\n  result: clean",
+   "data": {
+    "measurements": {},
+    "findings": [],
+    "seconds": 21.0,
+    "commit": "9c1d338865d5a586f5b6d7dd5920657e011cad9a",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "Smokea created"
+     },
+     {
+      "ok": true,
+      "summary": "looked around"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.1.base",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k practice_empty` on the base",
+   "ok": true,
+   "expected": "xania crashes in skill_lookup (the known-bug check sees the crash)",
+   "detail": "pytest exit 0: 1 passed, 4 deselected in 39.38s",
+   "seconds": 40.0,
+   "log": ".                                                                        [100%]\n1 passed, 4 deselected in 39.38s",
+   "data": {}
+  },
+  {
+   "key": "sim.1.branch",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k practice_empty` on the branch",
+   "ok": true,
+   "expected": "xania answers \"You can't practice that.\" and survives (the known-bug check reports the bug gone)",
+   "detail": "pytest exit 1: 1 failed, 4 deselected in 45.44s",
+   "seconds": 46.0,
+   "log": "            # A real practice first: proves a trainer is here (and that the bot has sessions) before the odd one.\n            r = await bot.do(\"practice sword\", expect=r\"You practice|already learned|can't practice|can't do that here|\"\n                                                      r\"no practice sessions\")\n            if \"can't do that here\" in r.text:\n                continue\n            at_trainer = \"no practice sessions\" not in r.text\n            if at_trainer:\n                crashed = await _crashes_after(mud, bot, \"practice ''\")\n            break\n        report = mud.crash_report() if crashed else \"\"\n        if not crashed:\n            await bot.close()\n        if not at_trainer:\n            pytest.skip(\"no trainer with a session to spare was reached; the check didn't run\")\n        if crashed:\n            found.append(crash_finding(report, \"python -m pytest scenarios/test_live_bugs.py -k practice_empty\",\n                                       \"A bot typed practice '' at a trainer (a known-bug check).\"))\n            await mud.restart()\n>       assert crashed, \"practice '' no longer crashes xania: the bug looks fixed (or isn't there), retire this test\"\nE       AssertionError: practice '' no longer crashes xania: the bug looks fixed (or isn't there), retire this test\nE       assert False\nscenarios\\test_live_bugs.py:84: AssertionError\n=========================== short test summary info ===========================\nFAILED scenarios/test_live_bugs.py::test_practice_empty_quotes_at_a_trainer_crashes_debug_builds\n1 failed, 4 deselected in 45.44s",
+   "data": {}
+  },
+  {
+   "key": "sim.2.base",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k cast_empty` on the base",
+   "ok": true,
+   "expected": "xania crashes in skill_lookup via do_cast (the known-bug check sees the crash)",
+   "detail": "pytest exit 0: 1 passed, 4 deselected in 36.33s",
+   "seconds": 36.9,
+   "log": ".                                                                        [100%]\n1 passed, 4 deselected in 36.33s",
+   "data": {}
+  },
+  {
+   "key": "sim.2.branch",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k cast_empty` on the branch",
+   "ok": true,
+   "expected": "xania survives cast '' (the known-bug check reports the bug gone)",
+   "detail": "pytest exit 1: 1 failed, 4 deselected in 31.97s",
+   "seconds": 32.5,
+   "log": "F                                                                        [100%]\n================================== FAILURES ===================================\n_________________ test_cast_empty_quotes_crashes_debug_builds _________________\nmud = <xania_sim.core.server.TestMud object at 0x000002C1F050A3C0>\nnames = <function names.<locals>.<lambda> at 0x000002C1F137DF30>, found = []\n    async def test_cast_empty_quotes_crashes_debug_builds(mud, names, found):\n        \"\"\"magic.cpp do_cast -> lookup.cpp skill_lookup: `cast ''` anywhere. Like practice '' (abraidotti/xania#7), but\n        any player can type it in any room: do_cast only checks that the line had arguments.\"\"\"\n        bot = Bot(names(), \"simpass1\", host=mud.host, port=mud.port)\n        await bot.enter(Profile())\n        crashed = await _crashes_after(mud, bot, \"cast ''\")\n        report = mud.crash_report() if crashed else \"\"\n        if not crashed:\n            await bot.close()\n        if crashed:\n            found.append(crash_finding(report, \"python -m pytest scenarios/test_live_bugs.py -k cast_empty\",\n                                       \"A bot typed cast '' (a known-bug check).\"))\n            await mud.restart()\n>       assert crashed, \"cast '' no longer crashes xania: the bug looks fixed, retire this test\"\nE       AssertionError: cast '' no longer crashes xania: the bug looks fixed, retire this test\nE       assert False\nscenarios\\test_live_bugs.py:149: AssertionError\n=========================== short test summary info ===========================\nFAILED scenarios/test_live_bugs.py::test_cast_empty_quotes_crashes_debug_builds\n1 failed, 4 deselected in 31.97s",
+   "data": {}
+  },
+  {
+   "key": "sim.3.branch",
+   "title": "Sim `skill bash --classes knight --fights 2` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 252 s (skill bash, kind combat skill, learned by knight 5)",
+   "seconds": 252.9,
+   "log": "[00:00] skill trial: planned (skill=bash kind=combat skill classes=knight 5)\n[01:13] skill knight 5: staged (ok=True)\n[01:13] skill knight 5: practising\n[01:26] skill knight 5: using (practice=1->28)\n[04:09] skill knight 5: done (uses=5 worked=2 fights=the small troll: won, the small troll: won)\nskill: Skill: bash (252 s, Xania 9c1d338865)\n  skill bash, kind combat skill, learned by knight 5\n  xania_log: runs\\skill-20261111-153450\\xania.log\n  transcripts: runs\\skill-20261111-153450\n  result: clean",
+   "data": {
+    "measurements": {
+     "skill": "bash",
+     "kind": "combat skill",
+     "learned_by": "knight 5",
+     "knight 5": {
+      "level": 5,
+      "uses": 5,
+      "success_rate": 0.4,
+      "damage_seen": null,
+      "damage_per_attempt_seen": null,
+      "damage_predicted": null,
+      "mana": 0.0,
+      "practice": "1% -> 28%",
+      "use_gain": 2,
+      "fights": "the small troll: won, the small troll: won",
+      "silent_uses": 0
+     }
+    },
+    "findings": [],
+    "seconds": 252.3,
+    "commit": "9c1d338865d5a586f5b6d7dd5920657e011cad9a",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "knight 5: 5 uses, 2 worked"
+     }
+    ]
+   }
+  },
+  {
+   "key": "static",
+   "title": "Builder's detectors on the focus, base against branch",
+   "ok": true,
+   "expected": "no string_view indexed like a C string is left in the focus",
+   "detail": "2 before, 0 after",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "function": "skill_lookup",
+      "base": [
+       "`name[0]` at src/lookup.cpp:39",
+       "`name[0]` at src/lookup.cpp:39"
+      ],
+      "branch": []
+     },
+     {
+      "function": "do_practice",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "Interpreter::Impl::interpret",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "MudImpl::game_loop",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "ArgParser::shift",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "do_sset",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "do_slookup",
+      "base": [],
+      "branch": []
+     }
+    ]
+   }
+  }
+ ],
+ "error": "",
+ "passed": true,
+ "exit_code": 0
+}

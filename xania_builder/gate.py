@@ -306,8 +306,9 @@ echo "user: $(whoami)"
             out = u.data.pop("output")
             junit = out.split("=== junit ===", 1)[1] if "=== junit ===" in out else ""
             cases = parse_junit(junit)
-            aborted = bool(re.search(r"Assertion '.*' failed|ERROR: AddressSanitizer", out)) and (
-                not cases or "</testsuites>" not in junit)
+            # A run that died (an assertion, ASan, or any signal: 134 abort, 139 segfault) leaves no full report.
+            died = u.data.get("exit", 0) >= 128 or bool(re.search(r"Assertion '.*' failed|ERROR: AddressSanitizer", out))
+            aborted = died and (not cases or "</testsuites>" not in junit)
             results[(where, lc)] = (cases, aborted)
             u.log = _tail(out.split("=== junit ===", 1)[0], 15)
             fails = sorted(k for k, v in cases.items() if v == "fail")
@@ -318,7 +319,8 @@ echo "user: $(whoami)"
             else:
                 u.ok = None  # judged by the before/after step
                 why = re.search(r"Assertion '.*' failed|ERROR: AddressSanitizer: \S+", out)
-                u.detail = (f"aborted: {why.group(0) if why else 'the test binary died'}" if aborted else
+                signal = {134: "SIGABRT", 139: "SIGSEGV (a segfault)"}.get(u.data.get("exit", 0), "")
+                u.detail = (f"aborted: {why.group(0) if why else signal or 'the test binary died'}" if aborted else
                             f"{len(fails)} of {len(cases)} failed" + (f": {', '.join(fails[:4])}" if fails else ""))
     # If the new tests need the change to compile, the base worktree didn't build, and Sim still needs the base:
     # build the base exactly as it is (without the branch's tests) for Sim's trials there.

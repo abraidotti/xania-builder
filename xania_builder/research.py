@@ -241,17 +241,30 @@ def patterns_section(ix: Index, fo: Focus) -> Section:
 
 # 4. Technical debt -----------------------------------------------------------------------------------------------
 
-def string_view_hits(ix: Index, fn: Function) -> list[tuple[str, str, int]]:
+GUARD_WINDOW = 15  # lines: an empty() test this close before a [0] counts as its guard
+
+
+def string_view_hits(ix: Index, fn: Function, guarded: bool = False) -> list[tuple[str, str, int]]:
     """Variables holding string_views (args.shift(), std::string_view) indexed like NUL-terminated C strings:
-    (the expression, file, line). Indexing a view at or past its size is undefined behaviour."""
-    code = ix.code(fn)
-    body = ix.body(fn)
+    (the expression, file, line). Indexing a view at or past its size is undefined behaviour.
+
+    Comments and strings don't count (the masked code is searched). A ``[0]`` with a test of the same view's
+    ``empty()`` in the GUARD_WINDOW lines before it is guarded, and left out unless ``guarded``: an empty() check makes
+    [0] safe, though not [3] (do_get checks arg1.empty() and still read arg1[3]), and only if it's close (nanny tests
+    argument.empty() in one case of its switch but not the others)."""
+    code = ix.code(fn)  # masked: comments and string literals blanked, positions kept
     views = set(re.findall(r"\bauto\s+(\w+)\s*=\s*\w+\.shift\(\)", code))
     views |= set(re.findall(r"\bstd::string_view\s+(\w+)", code))
+    lines = code.split("\n")
     out = []
     for v in sorted(views):
-        for m in re.finditer(r"&?\b" + re.escape(v) + r"\[(\d+)\]", body):
-            out.append((f"`{m.group(0)}`", fn.file, fn.line + body.count("\n", 0, m.start())))
+        for m in re.finditer(r"&?\b" + re.escape(v) + r"\[(\d+)\]", code):
+            n = code.count("\n", 0, m.start())
+            if m.group(1) == "0" and not guarded:
+                before = "\n".join(lines[max(0, n - GUARD_WINDOW):n] + [lines[n][:m.start() - code.rfind("\n", 0, m.start()) - 1]])
+                if re.search(r"\b" + re.escape(v) + r"\.empty\(\)", before):
+                    continue
+            out.append((f"`{m.group(0)}`", fn.file, fn.line + n))
     return sorted(out, key=lambda h: h[2])
 
 
@@ -410,13 +423,17 @@ def tests_section(ix: Index, fo: Focus, cfg) -> tuple[Section, dict]:
     s = Section("tests", "Test coverage")
     names = [f.short for f in fo.functions]
     unit: list[str] = []
+    # One line per test file, with every reason it's relevant (several focus files often share the same tests).
+    reasons: dict[str, list[str]] = {}
     for rel in fo.files:
         found = ix.tests_for(rel, names)
         for t, why in found.items():
-            s.facts.append(f"`{t}`: {', '.join(dict.fromkeys(why))}")
-            unit.append(t)
+            reasons.setdefault(t, []).extend(why)
         if not found:
             s.facts.append(f"No unit test file for `{rel}`.")
+    for t, why in sorted(reasons.items()):
+        s.facts.append(f"`{t}`: {', '.join(dict.fromkeys(why))}")
+        unit.append(t)
     for fn in fo.functions:
         if not any(re.search(r"\b" + re.escape(fn.short) + r"\b", sf.code) for sf in ix.tests.values()):
             s.facts.append(f"No unit test calls `{fn.short}`.")

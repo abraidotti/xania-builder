@@ -159,8 +159,12 @@ def history_section(ix, fo, flagged: list[tuple[str, str, int]], upstream: str,
             s.facts.append(f"Since {oldest.sha[:7]} ({oldest.date}), {len(later)} commits changed the compiler or "
                            "its flags; the latest: " + "; ".join(c.short() for c in later[:5]))
     s.facts += build_modes(root)
-    # Function names only: command words like "get" match half the tracker.
-    words = list(dict.fromkeys(fn.short for fn in fo.functions))[:4]
+    # Function names only: command words like "get" match half the tracker. And only the functions the change is about
+    # (those with flagged lines, else the first two): a reported call path adds interpret() and game_loop(), which
+    # every crash goes through.
+    flagged_fns = [fn.short for fn in fo.functions if any(r == fn.file and fn.line <= ln <= fn.end
+                                                           for _, r, ln in flagged)]
+    words = list(dict.fromkeys(flagged_fns or [fn.short for fn in fo.functions][:2]))[:4]
     hits = upstream_mentions(upstream, words)
     for h in hits[:8]:
         kind = "PR" if h.get("isPullRequest") else "issue"
