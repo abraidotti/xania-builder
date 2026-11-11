@@ -216,7 +216,8 @@ def ship(cfg, args) -> int:
 
     try:
         folder = gate_mod.find_dossier(Path(args.dossiers), args.dossier)
-        r = ship_mod.ship(cfg, folder, target=args.to, draft=args.draft, dry_run=args.dry_run, say=_say)
+        r = ship_mod.ship(cfg, folder, target=args.to, draft=args.draft, dry_run=args.dry_run, say=_say,
+                           branch=args.branch or "")
     except (FileNotFoundError, RuntimeError) as e:
         _say(f"COULDN'T RUN: {e}")
         return 2
@@ -264,6 +265,7 @@ def main(argv=None) -> int:
     sh.add_argument("dossier")
     sh.add_argument("--to", choices=["fork", "upstream"], default="fork")
     sh.add_argument("--draft", action="store_true")
+    sh.add_argument("--branch", help="ship this branch instead of the gated one (same code, e.g. reworded commits)")
     sh.add_argument("--dry-run", action="store_true", help="write pr.md and say what would happen; push nothing")
     sh.add_argument("--dossiers", default=str(config_mod.REPO / "dossiers"))
     sh.add_argument("--json", action="store_true")

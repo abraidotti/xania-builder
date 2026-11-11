@@ -136,6 +136,11 @@ def body(folder: Path, g: dict, target: str, issue_ref: str, fork: str, upstream
     parts += ["", "## Verification", "",
               "Run by Xania Builder's gate, in the same configurations CI uses (Debug, which here means "
               "ASan + UBSan + libstdc++ assertions, and Release -O2):", "", gate_tables(g, head)]
+    fork_pr = next((p["url"] for p in (json.loads((folder / "pr.json").read_text(encoding="utf-8"))["prs"]
+                                       if (folder / "pr.json").exists() else []) if p["target"] == "fork"), "")
+    if target == "upstream" and fork_pr:
+        parts += ["", f"The same change went through the fork first, where this repo's own CI (format, Debug and "
+                      f"Release build and test) passed: {fork_pr}."]
     if follow:
         parts += ["", "## Not in this PR", "", follow]
     parts += ["", "---", "",
@@ -153,19 +158,23 @@ def _run(cmd: list[str], cwd: Path | None = None) -> str:
     return r.stdout.strip()
 
 
-def ship(cfg, folder: Path, target: str = "fork", draft: bool = False, dry_run: bool = False, say=print) -> dict:
+def ship(cfg, folder: Path, target: str = "fork", draft: bool = False, dry_run: bool = False, say=print,
+         branch: str = "") -> dict:
+    """branch: ship this branch instead of the gated one (e.g. reworded commits for upstream); its code must be
+    identical to what the gate ran on."""
     gate_file = folder / "gate.json"
     if not gate_file.exists():
         raise RuntimeError(f"no gate for {folder.name}: run `prototype` first")
     g = json.loads(gate_file.read_text(encoding="utf-8"))
     if not g.get("passed"):
         raise RuntimeError(f"the gate for {folder.name} didn't pass; see {folder / 'gate.md'}")
-    head = _run(["git", "-C", str(cfg.source), "rev-parse", g["branch"]])
+    branch = branch or g["branch"]
+    head = _run(["git", "-C", str(cfg.source), "rev-parse", branch])
     # The gate proves code, not history: a branch squashed or reworded after the gate is still the code it gated,
     # as long as the tree (every file's content) is the same.
     tree = lambda ref: _run(["git", "-C", str(cfg.source), "rev-parse", f"{ref}^{{tree}}"])  # noqa: E731
     if head != g["branch_sha"] and tree(head) != tree(g["branch_sha"]):
-        raise RuntimeError(f"{g['branch']} is at {head[:10]}, whose code differs from what the gate ran on "
+        raise RuntimeError(f"{branch} is at {head[:10]}, whose code differs from what the gate ran on "
                            f"({g['branch_sha'][:10]}): rerun it")
     if not (folder / "analysis.md").exists():
         raise RuntimeError(f"no analysis.md in {folder}: write it (it answers the dossier's questions)")
@@ -174,18 +183,20 @@ def ship(cfg, folder: Path, target: str = "fork", draft: bool = False, dry_run: 
     # The branch's first commit says what the change is; later ones are usually follow-ups.
     title = plan.get("title") or _run(["git", "-C", str(cfg.source), "log", "--reverse", "--format=%s",
                                         f"{g['base_sha']}..{head}"]).splitlines()[0]
+    if target == "upstream":
+        title = re.sub(r"\s*\(#\d+\)$", "", title)  # "#1" in a title on upstream would mean upstream's #1
     text = body(folder, g, target, d["idea"].get("ref", ""), cfg.fork, cfg.upstream, head)
     (folder / ("pr.md" if target == "fork" else "pr-upstream.md")).write_text(text, encoding="utf-8")
     result = {"title": title, "target": target, "body": str(folder / "pr.md")}
     if dry_run:
-        say(f"ship (dry run): would push {g['branch']} and open \"{title}\" on "
+        say(f"ship (dry run): would push {branch} and open \"{title}\" on "
             f"{cfg.fork if target == 'fork' else cfg.upstream}; wrote {result['body']}")
         return result
     repo = cfg.fork if target == "fork" else cfg.upstream
     owner = cfg.fork.split("/")[0]
-    _run(["git", "-C", str(cfg.source), "push", "-u", "origin", f"{g['branch']}:{g['branch']}"])
-    head_ref = g["branch"] if target == "fork" else f"{owner}:{g['branch']}"
-    existing = json.loads(_run(["gh", "pr", "list", "-R", repo, "--head", g["branch"], "--state", "open",
+    _run(["git", "-C", str(cfg.source), "push", "-u", "origin", f"{branch}:{branch}"])
+    head_ref = branch if target == "fork" else f"{owner}:{branch}"
+    existing = json.loads(_run(["gh", "pr", "list", "-R", repo, "--head", branch, "--state", "open",
                                 "--json", "url,number"]) or "[]")
     body_file = folder / ("pr.md" if target == "fork" else "pr-upstream.md")
     if existing:

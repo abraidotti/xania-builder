@@ -4,6 +4,11 @@
    "target": "fork",
    "url": "https://github.com/abraidotti/xania/pull/5",
    "label": "PR on the fork"
+  },
+  {
+   "target": "upstream",
+   "url": "https://github.com/mattgodbolt/xania/pull/308",
+   "label": "PR on upstream"
   }
  ]
 }
