@@ -33,6 +33,24 @@ python -m pytest                          # unit tests (a small fake checkout; n
 
 `gh` (the GitHub CLI) is needed to read issues and, later, to open pull requests.
 
+## Issue first: when a change needs decisions
+
+Some changes aren't just bugs with one right fix. Fixing them means choosing a rate, a rule or a behaviour that
+players will feel. For those, file an issue on the fork first and open a PR only once every question is answered:
+
+1. **Evidence first.** Explorer's counts (what in the world is affected, at which levels) and a Sim trial showing
+   what the game does today, with numbers.
+2. **Options, with numbers.** Two or so ways to fix it, each with what it would mean in play, plus how comparable
+   codebases do it, where that helps.
+3. **Questions, each with a recommended answer.** Every open decision becomes a numbered question with a
+   recommendation and the reason for it, so a reader can just agree or push back. People find this far easier to
+   act on than bare questions.
+4. **Wait for answers**, then research, gate and ship as usual, with the PR saying which answer each choice follows.
+
+The issue uses the same five headings as a bug report (Summary, How to reproduce, Faulty lines, Suggested fix, How
+this was found), with the options and questions under Suggested fix. Example:
+[abraidotti/xania#9](https://github.com/abraidotti/xania/issues/9) (vampiric weapons).
+
 ## Research: the dossier
 
 ```
