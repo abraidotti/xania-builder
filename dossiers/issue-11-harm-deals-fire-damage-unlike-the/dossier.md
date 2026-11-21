@@ -1,0 +1,287 @@
+# harm deals fire damage, unlike the rest of the Harmful group (DAM_HARM became DAM_FIRE in d165e77) (#11)
+
+[#11](https://github.com/abraidotti/xania/issues/11) · Xania eec205e5fd · 2026-11-20 21:22
+
+<details><summary>The idea as given</summary>
+
+## Summary
+
+`spell_harm` deals **fire** damage. It's the only spell in the Harmful group that does: `cause light`, `cause serious` and `cause critical` all deal `DamageType::Harm`, and so did harm itself until d165e77 (2020-09-23). That commit moved the direct-damage spells to table lookups and changed harm's type from `DAM_HARM` to `DAM_FIRE` along the way. It's the only spell whose damage type changed in that commit, so it looks like a copy from `spell_fireball`, the function harm's new damage table is shared with (`FireballHarmDamage`). The commit message and the comment above `spell_harm` are about damage amounts, level and mana, not about the damage type.
+
+The type decides three things a player notices:
+
+1. **Who resists it.** Fire damage checks a mob's Fire tolerance; Harm damage checks its Magic tolerance (`DamageTolerance.cpp:50`). Of the 1,657 mobs in the area files, **338 take different damage from harm as Fire than as Harm**, and 334 of them are placed by resets. Today, trolls take 1.5× damage from harm (fire vulnerable), giants and modrons take 2/3 (fire resistant), and dolls take 1.5× where they'd be immune.
+2. **The damage message.** Verbs are picked per damage type, so harm says it *scalds*, *chars* and *ATOMIZES* its victims, like a fireball. The cause spells use the generic verbs (*hit*, *MANGLE*).
+3. **Being thrown from a mount.** `fight.cpp:859` lists Harm on its own, with a much higher chance of unseating a rider than fire has.
+
+Impact: gameplay only, no crash. It affects clerics (harm at 23) and knights (26) who take the Harmful group, mobs with `spec_cast_cleric` from level 30 (they cast harm at players), and the bone bomb in Flying Citadel (obj 13023). Present at 82171fa (the fork's main and upstream main).
+
+Since the fix changes who harm hurts and by how much, this issue sets out options and questions before any PR.
+
+## How to reproduce
+
+**Code.** Compare `spell_harm` with the cause spells in `src/magic.cpp` (table below), and the history:
+
+```
+$ git log -L '/^void spell_harm/,+8:src/magic.cpp' --oneline
+...
+d165e77 Make most of the direct damage spells use table based lookups. ...
+-    damage(ch, victim, dam, sn, DAM_HARM);
++    auto dam_level = get_direct_dmg_and_level(level, FireballHarmDamage);
++    if (saves_spell(dam_level.second, victim))
++        dam_level.first /= 2;
++    damage(ch, victim, dam_level.first, sn, DAM_FIRE);
+```
+
+In the same commit, the three cause spells keep `DAM_HARM`. The original import (33a9553) has `damage( ch, victim, dam, sn, DAM_HARM );`.
+
+**In play.** A Sim `skill harm --classes cleric` trial staged a level 23 cleric and cast harm at an escaped prisoner in the Midgaard park. Every hit used a fire verb:
+
+```
+10:46:04 < Your harm spell chars the escaped prisoner's head! (117)
+10:46:07 < Your harm spell roasts the escaped prisoner's head. (83)
+10:46:14 < Your harm spell grills the escaped prisoner's midriff. (57)
+10:46:17 < Your harm spell roasts the escaped prisoner's head. (84)
+```
+
+By hand: cast `cause critical` and then `harm` at the same mob. From the verb table (`DamageMessages.cpp`), the cause spell should use the generic verbs, the ones melee uses, while harm *roasts* or *grills*. Against a troll (e.g. "the young troll", 2801, Troll Den), harm should do 1.5× what it would as Harm damage, because trolls are fire vulnerable (`Races.cpp:130-134`). Neither of these was run in Sim yet.
+
+(That first run stalled after these four casts, before its summary; the cause isn't known yet, and reruns finished cleanly. A known-bug check that casts harm at a troll and at a fire-immune mob is on its way.)
+
+## Faulty lines
+
+| file:line | code | problem |
+|---|---|---|
+| `src/magic.cpp:2454` | `damage(ch, victim, dam_level.first, &skill_table[sn], DamageType::Fire);` | harm deals fire damage; it was `DAM_HARM` before d165e77 |
+| `src/magic.cpp:957`, `:967`, `:977` | `damage(..., DamageType::Harm);` | the rest of the Harmful group (cause light / critical / serious), for comparison |
+| `src/DamageTolerance.cpp:50` | `case DamageType::Harm:` → `ToleranceFlag::Magic` | what Harm damage is meant to check; covered by `DamageToleranceTest.cpp:116` |
+| `src/fight.cpp:859` | `case DamageType::Harm: fallchance += 10; break;` | Harm has its own case for being thrown from a mount; fire falls to `default: fallchance += 40` |
+| `src/magic.cpp:2445-2446` | `// Clerics can opt in to the Harm group fairly cheaply. ...` | the comment compares harm with fireball on level and mana efficiency, not damage type |
+
+## Suggested fix
+
+### What changes, by the numbers
+
+From the area files (Explorer's area parser, with race tolerances from `Races.cpp` merged in the way `MobIndexData.cpp:64-66` does). Of the 334 placed mobs whose damage would change:
+
+| | mobs | notes |
+|---|---|---|
+| take **more** damage from harm | 145 | e.g. giants and modrons, and Fire Newt Mountain's newts (fire resistant, no Magic tolerance); fire-immune mobs such as the fire elemental |
+| take **less** damage from harm | 189 | e.g. trolls lose their fire vulnerability; many town NPCs are immune to Magic |
+| become **immune** | 57 | mostly shopkeepers, guildmasters and Mud School adepts that `is_safe` already protects; plus the 5 dolls of Dwarven Day Care (levels 1-3) |
+| stop being immune | 21 | fire-immune mobs, e.g. the fire elemental (Temple of the Great Wyrm, L50), the red bat (Moria) |
+
+By level band: 1-22: 68 more / 51 less; 23-40: 20 / 52; 41-60: 18 / 20; 61+: 39 / 66.
+
+A quick worked example for the mount: a player with ride at 75% hit by harm from a mob of the same level. As Fire, fallchance is 75 + 40 = 115, clamped to 100: **never thrown**. As Harm, it's 75 + 10 = 85: thrown **15%** of the time.
+
+Players are barely affected as victims: no PC race has a Fire or Magic tolerance.
+
+### Options
+
+**A. Restore `DamageType::Harm` (recommended).** A one-word change at `magic.cpp:2454`. Harm goes back to matching the rest of its group, its help entry (which lists it with the cause spells), the original Xania code, and ROM 2.4 (`damage_old(..., DAM_HARM, TRUE)`). Clerics get back a nuke that isn't fire, next to Attack's flamestrike, which is fire. Damage amounts don't change.
+
+**B. Keep Fire, on purpose.** No code change, but the comment above `spell_harm` should say so, and the help entry should stop grouping harm with the cause spells. Clerics who take both Attack and Harmful then have two fire nukes and nothing against fire-immune mobs.
+
+### Questions
+
+1. **Was Fire intended in d165e77?**
+   *Recommended:* treat it as a slip unless the author remembers otherwise. It's the only damage type that commit changed, and nothing in the commit message or comments mentions it.
+2. **A or B?**
+   *Recommended:* A. It matches the group, the help, the original and ROM, and it makes harm a real alternative to flamestrike instead of a second copy.
+3. **Should Harm get its own damage verbs?** With A, harm's messages go from fire verbs to the generic ones the cause spells use.
+   *Recommended:* not in this fix. Keep the whole group consistent with each other; new verbs can be their own change if anyone wants them.
+4. **Is it fine that the Dwarven Day Care dolls become immune?** (5 mobs, levels 1-3; today harm does 1.5× to them.)
+   *Recommended:* yes. The cause spells already can't hurt them, and nobody casting harm (level 23+) needs to fight them.
+5. **Keep `fight.cpp:859`'s Harm case as it is?** With A, harm throws riders more often (the 15% vs 0% above).
+   *Recommended:* yes. The case is there because someone listed Harm on purpose; the fix just makes harm reach it again.
+6. **Tests?**
+   *Recommended:* `DamageToleranceTest.cpp:116` already covers Harm → Magic. Add a Catch2 test that harm deals `DamageType::Harm`, if `spell_harm` can be called from a test without a world; otherwise rely on a Sim check that casts harm at a troll and a fire-immune mob, on the base and on the fix.
+
+## How this was found
+
+Reading the direct-damage spells in `magic.cpp`: harm was the odd one out in its group. Then:
+
+- **History:** `git log -L` on `spell_harm` (above), and the same commit's diff for every other spell.
+- **Counts:** a scratch script on Explorer's area parser: every mob's Fire and Magic tolerance, with race flags merged, and the resets that place it. Explorer's own combat model already treats Harm as Magic (`tolerance()` in `assess/combat.py`), so its predictions for harm will be right once the server matches. Two area files didn't parse with it (LairOfTheShadowCouncil.are, proto.are) and aren't in the counts.
+- **Play:** a Sim `skill harm` trial (above): four casts, four fire verbs.
+
+</details>
+
+## Focus
+
+- `spell_harm` (src/magic.cpp:2447, 9 lines): named with --symbol
+- `check_damage_tolerance` (src/DamageTolerance.cpp:16, 46 lines): DamageTolerance.cpp:50 is in it
+- `damage` (src/fight.cpp:586, 288 lines): fight.cpp:859 is in it
+- `spell_cause_light` (src/magic.cpp:950, 9 lines): src/magic.cpp:957 is in it
+- `MobIndexData::MobIndexData` (src/MobIndexData.cpp:28, 61 lines): MobIndexData.cpp:64 is in it
+- `spell_fireball` (src/magic.cpp:2231, 9 lines): named in the idea
+- `spec_cast_cleric` (src/special.cpp:327, 67 lines): named in the idea
+- `is_safe` (src/fight.cpp:877, 56 lines): named in the idea
+- `src/DamageMessages.cpp`
+- `src/Races.cpp`
+
+## 1. Explorer insights
+
+- Bug check `code.vampiric-integer-drain` (present, wrong-behaviour): Vampiric weapons drain nothing from hits under 100 damage. fight.cpp:718, fight.cpp:719
+- Bug check `code.elemental-weapon-flags` (present, wrong-behaviour): Flaming and frost weapons do nothing in combat. mentions `damage`
+- Bug check `code.harm-fire-damage` (present, wrong-behaviour): The harm spell does fire damage. magic.cpp:2447
+- The **Characters** assessment reads Races.cpp; a change here can move its numbers (ok).
+- Characters finding `characters.xp-cost` (impact 2): A dragon needs 4× the XP per level of a human
+- Recommendation `characters.xp-cost.race-points`: Cut the creation points of the dearest races
+- Characters finding `characters.race-value` (impact 2): Expensive races buy very little extra HP
+- The **Skills & spells** assessment reads magic.cpp; a change here can move its numbers (ok).
+- Skills & spells finding `skills.nothing-new` (impact 2): Nothing new to learn after level 70
+- Skills & spells finding `skills.practice-budget` (impact 2): Practices only catch up with the default package by level 79
+- Skills & spells finding `skills.spells-vs-hp` (impact 3): Attack spells fall behind mob HP: 41 casts per kill by level 91
+- Recommendation `skills.spells-vs-hp.scale-damage`: Let attack-spell damage keep growing after the 30s
+
+**To decide**
+
+- [ ] The fix should turn the code check above to `fixed` (it matches the faulty pattern). Does it, and are there other occurrences to fix at the same time?
+
+## 2. Architecture
+
+- `spell_harm` is defined at src/magic.cpp:2447-2455 (9 lines): `void spell_harm(int sn, int level, Char *ch, const SpellTarget &spell_target)`
+- No caller found for `spell_harm` in src/ (it may be called through a table or pointer).
+- `spell_harm` calls `damage`, `getChar`, `get_direct_dmg_and_level`, `saves_spell`
+- `check_damage_tolerance` is defined at src/DamageTolerance.cpp:16-61 (46 lines): `DamageTolerance check_damage_tolerance(const Char *ch, const DamageType damage_type)`
+- Called from `damage` (src/fight.cpp:586), `char_to_room` (src/handler.cpp:274), `spell_psy_tornado` (src/magic2.cpp:95), `char_update` (src/update.cpp:655)
+- `check_damage_tolerance` calls `check_enum_bit`
+- `damage` is defined at src/fight.cpp:586-873 (288 lines): `bool damage(Char *ch, Char *victim, const int raw_damage, const AttackType atk_type, const DamageType damage_type)`
+- Called from `one_hit` (src/fight.cpp:410), `do_bash` (src/fight.cpp:1680), `do_dirt` (src/fight.cpp:1781), `do_trip` (src/fight.cpp:1900), `do_backstab` (src/fight.cpp:2087), `do_headbutt` (src/fight.cpp:2259), `do_kick` (src/fight.cpp:2362), `spell_acid_blast` (src/magic.cpp:671), `spell_burning_hands` (src/magic.cpp:795), `spell_call_lightning` (src/magic.cpp:805), `spell_cause_light` (src/magic.cpp:950), `spell_cause_critical` (src/magic.cpp:960), `spell_cause_serious` (src/magic.cpp:970), `spell_chain_lightning` (src/magic.cpp:980), `spell_chill_touch` (src/magic.cpp:1106), `spell_colour_spray` (src/magic.cpp:1128), `spell_exorcise` (src/magic.cpp:1350), `spell_demonfire` (src/magic.cpp:1378), `spell_dispel_evil` (src/magic.cpp:1522), `spell_dispel_good` (src/magic.cpp:1545), `spell_earthquake` (src/magic.cpp:1584), `spell_energy_drain` (src/magic.cpp:2203), `spell_fireball` (src/magic.cpp:2231), `spell_flamestrike` (src/magic.cpp:2246), `spell_harm` (src/magic.cpp:2447), `spell_holy_word` (src/magic.cpp:2597), `spell_lightning_bolt` (src/magic.cpp:2804), `spell_magic_missile` (src/magic.cpp:2863), `spell_shocking_grasp` (src/magic.cpp:3231), `spell_acid_breath` (src/magic.cpp:3480), `spell_fire_breath` (src/magic.cpp:3544), `spell_frost_breath` (src/magic.cpp:3603), `spell_gas_breath` (src/magic.cpp:3634), `spell_lightning_breath` (src/magic.cpp:3651), `spell_general_purpose` (src/magic.cpp:3670), `spell_high_explosive` (src/magic.cpp:3680), `tornado_dam` (src/magic2.cpp:64), `fallen_off_mount` (src/ride.cpp:62), `char_update` (src/update.cpp:655)
+- `damage` calls `ArgParser` (3 definitions), `act` (7 definitions), `affect_strip`, `announce`, `bug` (2 definitions), `check_damage_tolerance`, `check_dodge`, `check_enum_bit`, `check_improve`, `check_killer`, `check_material_vulnerability`, `check_parry` and 49 more
+- `spell_cause_light` is defined at src/magic.cpp:950-958 (9 lines): `void spell_cause_light(int sn, int level, Char *ch, const SpellTarget &spell_target)`
+- No caller found for `spell_cause_light` in src/ (it may be called through a table or pointer).
+- `spell_cause_light` calls `damage`, `getChar`, `get_direct_dmg_and_level`, `saves_spell`
+- `MobIndexData::MobIndexData` is defined at src/MobIndexData.cpp:28-88 (61 lines): `MobIndexData::MobIndexData(sh_int vnum, FILE *fp, const Logger &logger) : vnum(vnum)`
+- Called from `MobIndexData::from_file` (src/MobIndexData.cpp:14)
+- `MobIndexData` calls `bug` (2 definitions), `fread_flag`, `fread_number`, `fread_string`, `fread_word`, `from_file` (4 definitions), `index_of`, `lookup_with_default` (2 definitions), `lower_case_articles`, `race_lookup`, `read_from_word`, `set_enum_bit` and 4 more
+- `spell_fireball` is defined at src/magic.cpp:2231-2239 (9 lines): `void spell_fireball(int sn, int level, Char *ch, const SpellTarget &spell_target)`
+- No caller found for `spell_fireball` in src/ (it may be called through a table or pointer).
+- `spell_fireball` calls `damage`, `getChar`, `get_direct_dmg_and_level`, `saves_spell`
+- `spec_cast_cleric` is defined at src/special.cpp:327-393 (67 lines): `bool spec_cast_cleric(Char *ch)`
+- Called from `spec_mayor` (src/special.cpp:842)
+- `spec_cast_cleric` calls `SpellTarget` (3 definitions), `is_pos_fighting`, `number_bits` (2 definitions), `pick_fighting_victim`, `skill_lookup`
+- `is_safe` is defined at src/fight.cpp:877-932 (56 lines): `bool is_safe(Char *ch, Char *victim)`
+- Called from `do_consider` (src/act_info.cpp:1456), `do_steal` (src/act_obj.cpp:1738), `damage` (src/fight.cpp:586), `do_bash` (src/fight.cpp:1680), `do_dirt` (src/fight.cpp:1781), `do_trip` (src/fight.cpp:1900), `do_kill` (src/fight.cpp:1994), `do_murder` (src/fight.cpp:2045), `do_backstab` (src/fight.cpp:2087), `spell_psy_tornado` (src/magic2.cpp:95)
+- `is_safe` calls `act` (7 definitions), `check_enum_bit`, `is_aff_charm`, `is_duel_in_progress`, `is_immortal`, `is_npc`, `is_pc`, `is_safe_room`, `send_line` (2 definitions)
+- `src/magic.cpp`: 3824 lines, 125 functions
+- `src/DamageTolerance.cpp`: 61 lines, 1 functions
+- `src/fight.cpp`: 2498 lines, 47 functions
+- `src/MobIndexData.cpp`: 89 lines, 2 functions
+- `src/special.cpp`: 956 lines, 26 functions
+- `src/DamageMessages.cpp`: 347 lines, 13 functions
+- `src/Races.cpp`: 256 lines, 0 functions
+
+**To decide**
+
+- [ ] Is the change local to these functions, or does the fix belong in a shared helper their callers use too?
+- [ ] Does every caller (including automatic ones) still get the behaviour it expects?
+
+## 3. Design patterns
+
+- In `damage`: ArgParser x1 (modern), fmt::format x1 (modern), matches()/matches_start() x1 (modern), range-for over contents x1 (modern), act() x6 (either)
+- In `is_safe`: act() x1 (either)
+- Across src/: act() 779, std::string_view 626, ArgParser 402, matches()/matches_start() 289, range-for over contents 267, fmt::format 211, sprintf/strcpy/strcat 19, '\0' terminator checks 13, char buffers 10
+
+**To decide**
+
+- [ ] Which existing idiom does the change follow, and does it leave the function more consistent?
+- [ ] Is there a helper already (in the same file or a header) that does what the change needs?
+
+## 4. Technical debt
+
+- `damage` is 288 lines long (src/ median 7).
+- `MobIndexData` is 61 lines long (src/ median 7).
+- `spec_cast_cleric` is 67 lines long (src/ median 7).
+- TODO at src/magic.cpp:211: perhaps the code for this and do_cast can be unified as they're similar.
+- TODO at src/magic.cpp:2730: #259 support more types
+- TODO at src/magic.cpp:2833: wth was this supposed to be?*/) {
+- TODO at src/DamageTolerance.cpp:21: sort this out.
+- TODO at src/DamageTolerance.cpp:24: I think we should ditch this catch all case and apply specific tolerance bits to
+- TODO at src/special.cpp:720: (#239) : no idea what this check is supposed to do, but was in the original code
+
+**To decide**
+
+- [ ] Are the other places with the same pattern the same bug, and do they belong in this change?
+- [ ] What debt does the change pay down while it's here, and what does it deliberately leave?
+- [ ] Does the change add any (a special case, a duplicated check, a new legacy idiom)?
+
+## 5. Gameplay
+
+- Messages `damage` can show: "Player {} fighting {} in #{}, damage {} exceeds {} cap!"; "$n fades into existence."; "|r$n is mortally wounded, and will die soon, if not aided.|w"; "|rYou are mortally wounded, and will die soon, if not aided.|w"; "|r$n is incapacitated and will slowly die, if not aided.|w"; "|rYou are incapacitated and will slowly die, if not aided.|w"; "|r$n is stunned, but will probably recover.|w"; "|rYou are stunned, but will probably recover.|w"; "|R$n is DEAD!!|w"; "|RYou have been KILLED!!|w" (+7)
+- Messages `MobIndexData` can show: "Invalid attack type {} in mob #{}, defaulting to hit"; "Unrecognized sex."; "Unrecognized body size: {},  defaulting!"
+- Messages `spec_cast_cleric` can show: "dispel evil"; "dispel good"; "dispel magic"
+- Messages `is_safe` can show: "The shopkeeper wouldn't like that."; "I don't think {} would approve!"; "Not in this room."; "But $N looks so cute and cuddly..."; "You don't own that monster."; "Sorry, player killing is not permitted."
+- Balance numbers Explorer models from these files: Characters, Skills & spells
+
+**To decide**
+
+- [ ] What does a player notice before and after (messages, what they get, what's refused)?
+- [ ] Can a careless or abusive player use the change (or the old behaviour) to their advantage?
+- [ ] Does it change balance for any class, race or level range? If so, which Explorer numbers?
+
+## 6. Documentation
+
+- Help `DAMAGE` mentions `damage` (area/Help.are:243)
+- Help `COMPARE` mentions `damage` (area/Help.are:503)
+- Help `WIMPY` mentions `damage` (area/Help.are:854)
+
+**To decide**
+
+- [ ] Does any help entry describe the behaviour being changed, and does it need rewording?
+- [ ] Does the change need a note anywhere else (README, release notes, an issue comment)?
+
+## 7. Test coverage
+
+- `src/test/DamageMessagesTest.cpp`: mentions damage, named after DamageMessages.cpp, includes DamageMessages.hpp
+- `src/test/DamageToleranceTest.cpp`: mentions check_damage_tolerance, named after DamageTolerance.cpp, includes DamageTolerance.hpp
+- `src/test/DuelTest.cpp`: mentions MobIndexData
+- `src/test/MProgImplTest.cpp`: mentions MobIndexData
+- `src/test/MProgLoaderTest.cpp`: mentions MobIndexData, includes MobIndexData.hpp
+- `src/test/MobIndexDataTest.cpp`: mentions damage, mentions MobIndexData, named after MobIndexData.cpp, includes MobIndexData.hpp, includes Races.hpp
+- `src/test/act_obj_test.cpp`: mentions MobIndexData
+- `src/test/magic_test.cpp`: named after magic.cpp
+- No unit test calls `spell_harm`.
+- No unit test calls `spell_cause_light`.
+- No unit test calls `spell_fireball`.
+- No unit test calls `spec_cast_cleric`.
+- No unit test calls `is_safe`.
+
+**To decide**
+
+- [ ] Which unit test pins the fixed behaviour (a test that fails before the change)?
+- [ ] Which Sim trial or scenario shows it from a player's side, and should a new one be added?
+
+## 8. History
+
+- `spell_harm` (9 lines) comes from 5 commits; the most: `42406b7` (2021-11-14, snellers): Replace spell function void* with SpellTarget type. (4 lines); `0dc5849` (2020-09-22, snellers): Refactor direct damage spells to use a common calculation function. (#216) (2 lines); `d165e77` (2020-09-23, snellers): Make most of the direct damage spells use table based lookups. Harm (1 lines); `659cf22` (2021-11-06, snellers): Macro death: Damage Types (1 lines)
+- `check_damage_tolerance` (46 lines) comes from 3 commits; the most: `659cf22` (2021-11-06, snellers): Macro death: Damage Types (23 lines); `71e55b1` (2021-07-04, snellers): merc.h cleanup: simplifying the concept of damage tolerance a bit, removing (14 lines); `1007912` (2021-10-29, snellers): Macro death: convert DMG_TOL_ bits to ToleranceFlag. (9 lines)
+- `damage` (288 lines) comes from 37 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (143 lines); `3152dd6` (2021-06-10, snellers): Refactoring damage(), one_hit(), multi_hit() and dam_message() to use a variant (18 lines); `67c49c7` (2020-08-04, Phil Norman): s/FALSE/false/g;s/TRUE/true/g (16 lines); `659cf22` (2021-11-06, snellers): Macro death: Damage Types (9 lines)
+- `spell_cause_light` (9 lines) comes from 5 commits; the most: `42406b7` (2021-11-14, snellers): Replace spell function void* with SpellTarget type. (4 lines); `0dc5849` (2020-09-22, snellers): Refactor direct damage spells to use a common calculation function. (#216) (2 lines); `d165e77` (2020-09-23, snellers): Make most of the direct damage spells use table based lookups. Harm (1 lines); `659cf22` (2021-11-06, snellers): Macro death: Damage Types (1 lines)
+- `MobIndexData` (61 lines) comes from 9 commits; the most: `687f6ce` (2025-05-11, snellers): Step 2 of the next big refactoring project. (23 lines); `5727c9d` (2020-09-13, Matt Godbolt): MobIndexData changes (#220) (11 lines); `a8d3c67` (2021-11-15, snellers): Modernize the attack type tables: (7 lines); `d28b087` (2021-07-11, snellers): Convert Char/Mob size to BodySize enum. Add utility functions and tests. (6 lines)
+- `spell_fireball` (9 lines) comes from 5 commits; the most: `42406b7` (2021-11-14, snellers): Replace spell function void* with SpellTarget type. (4 lines); `0dc5849` (2020-09-22, snellers): Refactor direct damage spells to use a common calculation function. (#216) (2 lines); `d165e77` (2020-09-23, snellers): Make most of the direct damage spells use table based lookups. Harm (1 lines); `659cf22` (2021-11-06, snellers): Macro death: Damage Types (1 lines)
+- `spec_cast_cleric` (67 lines) comes from 8 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (54 lines); `67c49c7` (2020-08-04, Phil Norman): s/FALSE/false/g;s/TRUE/true/g (4 lines); `3db18e5` (2020-10-04, Matt Godbolt): Move to char data lists throughout. (2 lines); `7a71102` (2020-07-22, Matt Godbolt): Reformat all the code with clang-format (2 lines)
+- `is_safe` (56 lines) comes from 12 commits; the most: `33a9553` (2020-07-05, Matt Godbolt): Initial import of just code, areas, and html (27 lines); `67c49c7` (2020-08-04, Phil Norman): s/FALSE/false/g;s/TRUE/true/g (11 lines); `a2c31f5` (2020-09-02, Matt Godbolt): Formatting changes. (4 lines); `9ced282` (2021-10-24, snellers): Macro death: convert Char ACT_ bit defines to CharActFlag enum. (4 lines)
+- Debug builds add `-fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined`
+- Release builds add `-O2 -DNDEBUG -Wno-error=array-bounds`
+- No upstream issue or PR on mattgodbolt/xania mentions `spell_harm`, `check_damage_tolerance`.
+
+**To decide**
+
+- [ ] When did the behaviour start, and why did nobody notice until now?
+- [ ] Did a toolchain change (compiler, flags, sanitizers) make it show, or change how it shows?
+- [ ] Has upstream seen or tried this before, and does the change fit what was decided then?
+
+## Gate plan
+
+What `prototype` runs on the fork before this can ship:
+
+- Builds: Debug (ASan, UBSan, LSan, libstdc++ assertions), Release (-O2)
+- Unit tests: `src/test/DamageMessagesTest.cpp`, `src/test/DamageToleranceTest.cpp`, `src/test/DuelTest.cpp`, `src/test/MProgImplTest.cpp`, `src/test/MProgLoaderTest.cpp`, `src/test/MobIndexDataTest.cpp`, `src/test/act_obj_test.cpp`, `src/test/magic_test.cpp`
+- Sim: `smoke`: the game still boots and a player can log in
+- Sim: `hunt --minutes 5`: fights and what runs after a kill (autoloot) reach it
+- Sim: `skill "harm"`: `spell_harm` is a spell
+- Sim: `skill "cause light"`: `spell_cause_light` is a spell
+- Sim: `skill "fireball"`: `spell_fireball` is a spell

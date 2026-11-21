@@ -1,0 +1,21 @@
+# What `prototype` runs for #11, beyond format, builds and unit tests (always run).
+base = "eec205e"   # main of the fork and of upstream after #307-#309 merged
+
+[[sim]]
+args = ["smoke"]
+why = "the game still boots and a player can create a character, look and quit"
+branch = "clean"
+
+[[sim]]
+args = ["pytest", "scenarios/test_live_bugs.py", "-k", "harm_deals_fire"]
+why = "a level-30 cleric casts harm and cause critical at a Magic-immune snotling (13015) and a Fire-immune red bat (4151)"
+base = "pass"
+base_means = "harm hurts the Magic-immune snotling with a fire verb and can't touch the Fire-immune bat: the opposite of cause critical"
+branch = "fail"
+branch_means = "harm behaves like cause critical: the snotling is unaffected (Magic immunity), so the known-bug check reports the bug gone"
+
+[[sim]]
+args = ["skill", "harm", "--classes", "cleric", "--fights", "2"]
+why = "harm still casts, hits and kills end to end, now with the generic damage verbs"
+branch = "clean"
+timeout = 900

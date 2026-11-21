@@ -1,0 +1,530 @@
+{
+ "schema": 1,
+ "slug": "issue-9-vampiric-weapons-drain-nothing-from-hits",
+ "branch": "fix/9-vampiric-drain",
+ "branch_sha": "7901035a37aac53a105052dbc5d6afbef254cc62",
+ "base_sha": "eec205e5fdb85c1799f1201d23b0cb8d91ba1b04",
+ "started": 1795228876.524742,
+ "seconds": 1781.5,
+ "environment": {
+  "gcc": "g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "os": "Ubuntu 26.04.1 LTS",
+  "distro": "Ubuntu-26.04"
+ },
+ "changes": {
+  "files": [
+   [
+    "A",
+    "src/VampiricDrain.cpp"
+   ],
+   [
+    "A",
+    "src/VampiricDrain.hpp"
+   ],
+   [
+    "M",
+    "src/fight.cpp"
+   ],
+   [
+    "A",
+    "src/test/VampiricDrainTest.cpp"
+   ]
+  ],
+  "stat": "4 files changed, 181 insertions(+), 7 deletions(-)",
+  "commits": [
+   "7901035 Vampiric weapons drain 5% of each weapon hit, with a message"
+  ],
+  "new_tests": [
+   "vampiric drain amount",
+   "vampiric drain"
+  ]
+ },
+ "steps": [
+  {
+   "key": "format",
+   "title": "clang-format (make check-format, as CI)",
+   "ok": true,
+   "expected": "no formatting differences",
+   "detail": "clean",
+   "seconds": 3.1,
+   "log": "Installing clang format static binary locally...\n/usr/bin/curl -sL --fail -m 120 --connect-timeout 3 --retry 3 --retry-max-time 360 https://github.com/muttleyxd/clang-format-static-binaries/releases/download/master-208096c1/clang-format-14_linux-amd64 -o ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/.tools/clang-format-14\n~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/.tools/clang-format-14 --dry-run -Werror ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Class.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AreaList.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/entity_balance.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ScrollTargetValidator.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/TimeInfoData.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/update.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Learning.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/WrappedFd.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PracticeTabulator.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Char.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Pronouns.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/VnumMobiles.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Shop.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Types.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_obj.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ObjectIndex.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/magic.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProgLoader.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AFFECT_DATA.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/channels.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SkillTables.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Constants.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DescriptorFilter.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/fight.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Help.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ScrollTargetValidator.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DamageMessages.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ObjectType.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Stats.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Finger.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PcCustomization.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SkillsTabulator.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PerEnum.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Stats.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CommandSet.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SectorType.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/string_utils.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Weapon.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/merc.h ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Socials.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Alignment.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/InterpreterImpl.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CharActFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/spec_concordius.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AreaList.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Titles.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/magic2.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/Fd.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/mask_hostname.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/Time.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/Fd.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/BitOps.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/StandardBits.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/Configuration.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/Byte.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/test/ConfigurationTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/test/TimeTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/test/mask_hostname_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/test/main.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/mask_hostname.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/doorman_protocol.h ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/common/Configuration.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Dice.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Visitor.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/handler.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProgImpl.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Channel.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Doorman.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Channel.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/TelnetProtocol.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/test/TelnetProtocolTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/test/IdAllocatorTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/test/main.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Logger.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Doorman.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/TelnetProtocol.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Xania.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Logger.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/Xania.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/IdAllocator.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/IdAllocator.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/doorman/main.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ClanCommFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/clan.h ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Attacks.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Learning.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/lookup.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ArgParser.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/update.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ObjectType.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Worn.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PlayerActFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Finger.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Weapon.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Rng.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/RoomFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/phil.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MobTrig.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/BodyPartFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ResetData.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Direction.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MudImpl.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DamageMessages.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AffectList.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Pronouns.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/InjuredPart.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Note.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MobIndexData.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_move.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/FlagFormat.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_info.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Char.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_info.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/skills.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ExitFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_comm.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Ban.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProg.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Ban.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ride.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/TimeInfoData.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DamageContext.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/db.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AffectList.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Object.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProg.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MobIndexData.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CorpseSummoner.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AFFECT_DATA.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/save.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/BodySize.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Lights.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/skills.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Sex.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/save.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DescriptorList.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Materials.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Duel.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Flag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Area.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PromptFormat.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PromptFormat.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ride.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MudImpl.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SpellTarget.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Sex.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/BodySize.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CorpseSummoner.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/VnumObjects.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Position.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/string_utils_impl.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ArmourClass.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Races.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Class.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Descriptor.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PcNutrition.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MorphologyFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ArgParser.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Descriptor.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/apps/map.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/apps/pfu.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/apps/pfu.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/apps/areas.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/apps/test/pfutest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/apps/test/main.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/apps/pfumain.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/wiznet.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SkillTables.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AffectLocation.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Room.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Act.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Logging.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Direction.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Note.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProgTriggerCtx.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/act_obj_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/CharTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/PracticeTabulatorTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/MProgImplTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/PromptFormatTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/fileutils.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/BodySizeTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/TitlesTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/HelpTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/magic_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/GetTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/WeaponTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/DescriptorTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/PositionTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/DuelTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/ScrollTargetValidatorTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/LoggingTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/FlagTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/SkillsTabulatorTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/CatchFormatters.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/ClassTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/db_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/ExtractCharTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/ObjectTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/AffectListTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/AreaTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/MemFile.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/VampiricDrainTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/WearTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/BansTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/TimeInfoDataTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/PronounsTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/HitChanceTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/AFFECT_DATATest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/MockMud.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/DamageMessagesTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/LearningTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/AttacksTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/SectorTypeTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/MaterialsTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/InjuredPartTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/lookup_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/DamageToleranceTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/CommandSetTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/PcNutritionTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/nth_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/MProgLoaderTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/InterpreterImplTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/save_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/DiceTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/MobIndexDataTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/string_utils_test.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/SexTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/MockRng.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/WeatherDataTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/NoteTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/ObjectTypeTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/CorpseSummonerTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/SocialsTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/ArgParserTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/TipsTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/main.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/test/GenericListTest.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ObjectIndex.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ObjectExtraFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ObjectIndexValidator.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/mob_commands.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Tips.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/VnumRooms.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SkillsTabulator.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Races.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/OffensiveFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SkillNumbers.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PracticeTabulator.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Materials.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/HitChance.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/nth.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Logging.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/AffectFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/fight.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Position.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/WeatherData.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Flag.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ExtraDescription.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/clan.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/HitChance.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CommFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Interpreter.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/db.h ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PcData.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/InjuredPart.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Columner.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Attacks.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Tip.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/InterpreterImpl.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/nth.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Dice.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Object.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ContainerFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/WeatherData.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Rng.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_obj.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/PcNutrition.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/string_utils.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Titles.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/healer.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DamageType.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Mud.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DamageTolerance.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_comm.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProgProgram.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_wiz.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DescriptorList.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Socials.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Tips.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_move.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProgImpl.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Format.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/lookup.h ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Tip.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Room.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/special.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProgTypeFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Exit.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Target.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CharExtraFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/VampiricDrain.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CharVersion.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/MProgLoader.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Act.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/magic.h ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/VampiricDrain.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/SectorType.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/GenericList.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Area.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/handler.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/WeaponFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/act_wiz.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/main.cpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ObjectWearFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Help.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/DamageTolerance.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/Duel.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/WrappedFd.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/ToleranceFlag.hpp ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/src/CharFileMeta.hpp",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "build.branch.debug",
+   "title": "Debug build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 141 s",
+   "seconds": 140.6,
+   "log": "Generating aggregated env files\nGenerated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\nInstall finished successfully\n-- CMake-Conan: CONAN_GENERATORS_FOLDER=~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/cmake-build-debug/conan\n-- CMake-Conan: CONANFILE=~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/conanfile.txt\n-- Conan: Component target declared 'spdlog::spdlog'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opensb2a02fcf50b86/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (42.0s)\n-- Generating done (0.1s)\n-- Build files have been written to: ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/cmake-build-debug\n/usr/bin/cmake --build ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.debug",
+   "title": "Unit tests, Debug, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1101 test cases and sections, all passed",
+   "seconds": 4.0,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.07 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   1.98 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1101,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.branch.release",
+   "title": "Release build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 145 s",
+   "seconds": 145.2,
+   "log": "Generating aggregated env files\nGenerated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\nInstall finished successfully\n-- CMake-Conan: CONAN_GENERATORS_FOLDER=~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/cmake-build-release/conan\n-- CMake-Conan: CONANFILE=~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/conanfile.txt\n-- Conan: Component target declared 'spdlog::spdlog'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opens50b520e94960d/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (41.8s)\n-- Generating done (0.1s)\n-- Build files have been written to: ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/cmake-build-release\n/usr/bin/cmake --build ~/xania-gate/issue-9-vampiric-weapons-drain-nothing-from-hits/branch/cmake-build-release",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.release",
+   "title": "Unit tests, Release, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1101 test cases and sections, all passed",
+   "seconds": 0.3,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.00 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   0.08 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1101,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.debug",
+   "title": "Debug build of the base with the branch's tests",
+   "ok": null,
+   "expected": "it compiles (-Werror)",
+   "detail": "the new tests use code the change adds, so they can't compile without it; Sim's trials on the base are the before/after proof",
+   "seconds": 2.7,
+   "log": "-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opensb2a02fcf50b86/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (2.1s)\n-- Generating done (0.1s)\n-- Build files have been written to: ~/xania-gate/_base-eec205e5fdb8/cmake-build-debug\nFAILED: [code=1] src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi \n/usr/bin/g++-15 -DCATCH_CONFIG_ENABLE_ALL_STRINGMAKERS -DCATCH_CONFIG_EXTERNAL_INTERFACES -DCURL_STATICLIB=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DTEST_DATA_DIR=\\\"~/xania-gate/_base-eec205e5fdb8/src/test/test_data\\\" -I~/xania-gate/_base-eec205e5fdb8/src/common/.. -isystem ~/.conan2/p/ms-gs0dca0ad769720/p/include -isystem ~/.conan2/p/b/dateb908529e1afd1/p/include -isystem ~/.conan2/p/b/fmtb0dcc6566c971/p/include -isystem ~/.conan2/p/range0301bf3d76d5d/p/include -isystem ~/.conan2/p/b/spdlo4ad83b33f87a9/p/include -isystem ~/.conan2/p/magic063a607ca5409/p/include -isystem ~/.conan2/p/b/catch6033a2d777cd4/p/include -isystem ~/.conan2/p/tromp61e1d5cd3f939/p/include -g -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined  -std=gnu++20 -Werror -Wall -Wextra -g -E -x c++ ~/xania-gate/_base-eec205e5fdb8/src/test/VampiricDrainTest.cpp -MT src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi -MD -MF src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi.d -fmodules-ts -fdeps-file=src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi -fdeps-target=src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o -fdeps-format=p1689r5 -o src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi.i\n~/xania-gate/_base-eec205e5fdb8/src/test/VampiricDrainTest.cpp:6:10: fatal error: VampiricDrain.hpp: No such file or directory\n    6 | #include \"VampiricDrain.hpp\"\n      |          ^~~~~~~~~~~~~~~~~~~\ncompilation terminated.\nninja: build stopped: subcommand failed.\nmake: *** [Makefile:46: build] Error 1",
+   "data": {
+    "exit": 2,
+    "needs_change": true
+   }
+  },
+  {
+   "key": "build.base.release",
+   "title": "Release build of the base with the branch's tests",
+   "ok": null,
+   "expected": "it compiles (-Werror)",
+   "detail": "the new tests use code the change adds, so they can't compile without it; Sim's trials on the base are the before/after proof",
+   "seconds": 2.0,
+   "log": "-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opens50b520e94960d/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (1.6s)\n-- Generating done (0.0s)\n-- Build files have been written to: ~/xania-gate/_base-eec205e5fdb8/cmake-build-release\nFAILED: [code=1] src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi \n/usr/bin/g++-15 -DCATCH_CONFIG_ENABLE_ALL_STRINGMAKERS -DCATCH_CONFIG_EXTERNAL_INTERFACES -DCURL_STATICLIB=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DTEST_DATA_DIR=\\\"~/xania-gate/_base-eec205e5fdb8/src/test/test_data\\\" -I~/xania-gate/_base-eec205e5fdb8/src/common/.. -isystem ~/.conan2/p/ms-gs0dca0ad769720/p/include -isystem ~/.conan2/p/b/date6715ef15e84c6/p/include -isystem ~/.conan2/p/b/fmt3df35e0a5dd70/p/include -isystem ~/.conan2/p/range0301bf3d76d5d/p/include -isystem ~/.conan2/p/b/spdlofbc5494bb83cc/p/include -isystem ~/.conan2/p/magic063a607ca5409/p/include -isystem ~/.conan2/p/b/catch7924f1ac3297a/p/include -isystem ~/.conan2/p/tromp61e1d5cd3f939/p/include -O2 -DNDEBUG -Wno-error=array-bounds -std=gnu++20 -Werror -Wall -Wextra -g -E -x c++ ~/xania-gate/_base-eec205e5fdb8/src/test/VampiricDrainTest.cpp -MT src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi -MD -MF src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi.d -fmodules-ts -fdeps-file=src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi -fdeps-target=src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o -fdeps-format=p1689r5 -o src/test/CMakeFiles/xania_test.dir/VampiricDrainTest.cpp.o.ddi.i\n~/xania-gate/_base-eec205e5fdb8/src/test/VampiricDrainTest.cpp:6:10: fatal error: VampiricDrain.hpp: No such file or directory\n    6 | #include \"VampiricDrain.hpp\"\n      |          ^~~~~~~~~~~~~~~~~~~\ncompilation terminated.\nninja: build stopped: subcommand failed.\nmake: *** [Makefile:46: build] Error 1",
+   "data": {
+    "exit": 2,
+    "needs_change": true
+   }
+  },
+  {
+   "key": "build.base-for-sim",
+   "title": "Debug build of the base as it is (for Sim's trials on it)",
+   "ok": true,
+   "expected": "it compiles and installs",
+   "detail": "built in 2 s",
+   "seconds": 1.8,
+   "log": "    target_link_libraries(... Catch2::Catch2WithMain Microsoft.GSL::GSL trompeloeil::trompeloeil spdlog::spdlog fmt::fmt date::date range-v3::range-v3 bfg::lyra magic_enum::magic_enum)\nGenerating aggregated env files\nGenerated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\nInstall finished successfully\n-- CMake-Conan: CONAN_GENERATORS_FOLDER=~/xania-gate/_base-eec205e5fdb8/cmake-build-debug/conan\n-- CMake-Conan: CONANFILE=~/xania-gate/_base-eec205e5fdb8/conanfile.txt\n-- Conan: Component target declared 'spdlog::spdlog'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opensb2a02fcf50b86/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (1.3s)\n-- Generating done (0.0s)\n-- Build files have been written to: ~/xania-gate/_base-eec205e5fdb8/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "before-after",
+   "title": "The new tests, before and after the change",
+   "ok": null,
+   "expected": "each new test fails or aborts on the base in at least one build, and passes on the branch",
+   "detail": "the new tests pass on the branch; they can't build on the base (they test code the change adds), so the base side is Sim's",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "case": "vampiric drain amount",
+      "base.debug": "not run",
+      "base.release": "not run",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "can't build before the change"
+     },
+     {
+      "case": "vampiric drain",
+      "base.debug": "not run",
+      "base.release": "not run",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "can't build before the change"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.0.branch",
+   "title": "Sim `smoke` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 22 s",
+   "seconds": 22.9,
+   "log": "smoke: Smoke: create a bot, look, quit (22 s, Xania 7901035a37)\n  transcript: runs\\20261120-214635\\Smokea.log\n  result: clean",
+   "data": {
+    "measurements": {},
+    "findings": [],
+    "seconds": 22.1,
+    "commit": "7901035a37aac53a105052dbc5d6afbef254cc62",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "Smokea created"
+     },
+     {
+      "ok": true,
+      "summary": "looked around"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.1.base",
+   "title": "Sim `weapon --rounds 40 --expect code today` on the base",
+   "ok": true,
+   "expected": "the old (damage / 100) * 10 explains the rounds best for every weapon: nothing below 100 damage",
+   "detail": "no crash in 476 s",
+   "seconds": 476.9,
+   "log": "[00:22] weapon 4100@20: setting up\n[02:57] weapon 4100@20: done (weapon=a black demon blade (#4100) level=20 rounds=40 hits=73 mean_hit=13.9 max_hit=24 hits_100_plus=0 drained_seen=0 rounds_unexplained=4 drink_messages=0 error=)\n[02:57] weapon 10066@65: setting up\n[05:24] weapon 10066@65: done (weapon=Executioner's Axe (#10066) level=65 rounds=40 hits=68 mean_hit=62.8 max_hit=100 hits_100_plus=1 drained_seen=10 rounds_unexplained=4 drink_messages=0 error=)\n[05:24] weapon 28021@91: setting up\n[07:51] weapon 28021@91: done (weapon=Sword of Ashen-Shugar (#28021) level=91 rounds=40 hits=64 mean_hit=82.2 max_hit=175 hits_100_plus=11 drained_seen=100 rounds_unexplained=4 drink_messages=0 error=)\nweapon: Weapon: a weapon flag in a real fight, hit by hit (476 s, Xania eec205e5fd)\n  result: clean",
+   "data": {
+    "measurements": {
+     "4100@20": {
+      "weapon": "a black demon blade (#4100)",
+      "flags": [
+       "Vampiric",
+       "TwoHands"
+      ],
+      "level": 20,
+      "rounds": 40,
+      "hits": 73,
+      "mean_hit": 13.9,
+      "max_hit": 24,
+      "hits_100_plus": 0,
+      "drained_seen": 0,
+      "drain_predicted": {
+       "code today: (damage / 100) * 10": 0,
+       "10% of the damage: damage / 10": 74,
+       "5% of the damage, rounded (#9)": 67
+      },
+      "rounds_explained_by": {
+       "code today: (damage / 100) * 10": 36,
+       "10% of the damage: damage / 10": 2,
+       "5% of the damage, rounded (#9)": 2
+      },
+      "rounds_unexplained": 4,
+      "drink_messages": 0,
+      "error": ""
+     },
+     "10066@65": {
+      "weapon": "Executioner's Axe (#10066)",
+      "flags": [
+       "Vampiric"
+      ],
+      "level": 65,
+      "rounds": 40,
+      "hits": 68,
+      "mean_hit": 62.8,
+      "max_hit": 100,
+      "hits_100_plus": 1,
+      "drained_seen": 10,
+      "drain_predicted": {
+       "code today: (damage / 100) * 10": 10,
+       "10% of the damage: damage / 10": 395,
+       "5% of the damage, rounded (#9)": 212
+      },
+      "rounds_explained_by": {
+       "code today: (damage / 100) * 10": 36
+      },
+      "rounds_unexplained": 4,
+      "drink_messages": 0,
+      "error": ""
+     },
+     "28021@91": {
+      "weapon": "Sword of Ashen-Shugar (#28021)",
+      "flags": [
+       "Vampiric",
+       "Sharp"
+      ],
+      "level": 91,
+      "rounds": 40,
+      "hits": 64,
+      "mean_hit": 82.2,
+      "max_hit": 175,
+      "hits_100_plus": 11,
+      "drained_seen": 100,
+      "drain_predicted": {
+       "code today: (damage / 100) * 10": 110,
+       "10% of the damage: damage / 10": 498,
+       "5% of the damage, rounded (#9)": 268
+      },
+      "rounds_explained_by": {
+       "code today: (damage / 100) * 10": 36,
+       "10% of the damage: damage / 10": 2
+      },
+      "rounds_unexplained": 4,
+      "drink_messages": 0,
+      "error": ""
+     }
+    },
+    "findings": [],
+    "seconds": 476.0,
+    "commit": "eec205e5fdb85c1799f1201d23b0cb8d91ba1b04",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "a black demon blade at knight 20: 40 rounds, 73 hits (mean 13.9, max 24, 0 of 100+), drained 0 HP, 0 drain messages; best model: code today: (damage / 100) * 10"
+     },
+     {
+      "ok": true,
+      "summary": "Executioner's Axe at knight 65: 40 rounds, 68 hits (mean 62.8, max 100, 1 of 100+), drained 10 HP, 0 drain messages; best model: code today: (damage / 100) * 10"
+     },
+     {
+      "ok": true,
+      "summary": "Sword of Ashen-Shugar at knight 91: 40 rounds, 64 hits (mean 82.2, max 175, 11 of 100+), drained 100 HP, 0 drain messages; best model: code today: (damage / 100) * 10"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.2.branch",
+   "title": "Sim `weapon --rounds 40 --expect #9` on the branch",
+   "ok": true,
+   "expected": "5% of each hit, rounded, explains the rounds best for every weapon, with a drain message on each draining hit",
+   "detail": "no crash in 477 s",
+   "seconds": 477.8,
+   "log": "[00:22] weapon 4100@20: setting up\n[02:54] weapon 4100@20: done (weapon=a black demon blade (#4100) level=20 rounds=40 hits=70 mean_hit=13.1 max_hit=25 hits_100_plus=0 drained_seen=56 rounds_unexplained=4 drink_messages=63 error=)\n[02:54] weapon 10066@65: setting up\n[05:24] weapon 10066@65: done (weapon=Executioner's Axe (#10066) level=65 rounds=40 hits=60 mean_hit=64.8 max_hit=107 hits_100_plus=2 drained_seen=172 rounds_unexplained=4 drink_messages=60 error=)\n[05:24] weapon 28021@91: setting up\n[07:54] weapon 28021@91: done (weapon=Sword of Ashen-Shugar (#28021) level=91 rounds=40 hits=65 mean_hit=79.5 max_hit=125 hits_100_plus=10 drained_seen=232 rounds_unexplained=4 drink_messages=65 error=)\nweapon: Weapon: a weapon flag in a real fight, hit by hit (477 s, Xania 7901035a37)\n  result: clean",
+   "data": {
+    "measurements": {
+     "4100@20": {
+      "weapon": "a black demon blade (#4100)",
+      "flags": [
+       "Vampiric",
+       "TwoHands"
+      ],
+      "level": 20,
+      "rounds": 40,
+      "hits": 70,
+      "mean_hit": 13.1,
+      "max_hit": 25,
+      "hits_100_plus": 0,
+      "drained_seen": 56,
+      "drain_predicted": {
+       "code today: (damage / 100) * 10": 0,
+       "10% of the damage: damage / 10": 68,
+       "5% of the damage, rounded (#9)": 63
+      },
+      "rounds_explained_by": {
+       "10% of the damage: damage / 10": 32,
+       "5% of the damage, rounded (#9)": 36,
+       "code today: (damage / 100) * 10": 2
+      },
+      "rounds_unexplained": 4,
+      "drink_messages": 63,
+      "error": ""
+     },
+     "10066@65": {
+      "weapon": "Executioner's Axe (#10066)",
+      "flags": [
+       "Vampiric"
+      ],
+      "level": 65,
+      "rounds": 40,
+      "hits": 60,
+      "mean_hit": 64.8,
+      "max_hit": 107,
+      "hits_100_plus": 2,
+      "drained_seen": 172,
+      "drain_predicted": {
+       "code today: (damage / 100) * 10": 20,
+       "10% of the damage: damage / 10": 362,
+       "5% of the damage, rounded (#9)": 195
+      },
+      "rounds_explained_by": {
+       "5% of the damage, rounded (#9)": 36
+      },
+      "rounds_unexplained": 4,
+      "drink_messages": 60,
+      "error": ""
+     },
+     "28021@91": {
+      "weapon": "Sword of Ashen-Shugar (#28021)",
+      "flags": [
+       "Vampiric",
+       "Sharp"
+      ],
+      "level": 91,
+      "rounds": 40,
+      "hits": 65,
+      "mean_hit": 79.5,
+      "max_hit": 125,
+      "hits_100_plus": 10,
+      "drained_seen": 232,
+      "drain_predicted": {
+       "code today: (damage / 100) * 10": 100,
+       "10% of the damage: damage / 10": 487,
+       "5% of the damage, rounded (#9)": 258
+      },
+      "rounds_explained_by": {
+       "5% of the damage, rounded (#9)": 36
+      },
+      "rounds_unexplained": 4,
+      "drink_messages": 65,
+      "error": ""
+     }
+    },
+    "findings": [],
+    "seconds": 477.0,
+    "commit": "7901035a37aac53a105052dbc5d6afbef254cc62",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "a black demon blade at knight 20: 40 rounds, 70 hits (mean 13.1, max 25, 0 of 100+), drained 56 HP, 63 drain messages; best model: 5% of the damage, rounded (#9)"
+     },
+     {
+      "ok": true,
+      "summary": "Executioner's Axe at knight 65: 40 rounds, 60 hits (mean 64.8, max 107, 2 of 100+), drained 172 HP, 60 drain messages; best model: 5% of the damage, rounded (#9)"
+     },
+     {
+      "ok": true,
+      "summary": "Sword of Ashen-Shugar at knight 91: 40 rounds, 65 hits (mean 79.5, max 125, 10 of 100+), drained 232 HP, 65 drain messages; best model: 5% of the damage, rounded (#9)"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.3.branch",
+   "title": "Sim `skill bash --classes knight --fights 2` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 185 s (skill bash, kind combat skill, learned by knight 5)",
+   "seconds": 185.9,
+   "log": "[00:00] skill trial: planned (skill=bash kind=combat skill classes=knight 5)\n[01:14] skill knight 5: staged (ok=True)\n[01:14] skill knight 5: practising\n[01:27] skill knight 5: using (practice=1->28)\n[03:02] skill knight 5: done (uses=2 worked=2 fights=the small troll: fled, the small troll: won)\nskill: Skill: bash (185 s, Xania 7901035a37)\n  skill bash, kind combat skill, learned by knight 5\n  xania_log: runs\\skill-20261120-220238\\xania.log\n  transcripts: runs\\skill-20261120-220238\n  result: clean",
+   "data": {
+    "measurements": {
+     "skill": "bash",
+     "kind": "combat skill",
+     "learned_by": "knight 5",
+     "knight 5": {
+      "level": 5,
+      "uses": 2,
+      "success_rate": 1.0,
+      "damage_seen": null,
+      "damage_per_attempt_seen": null,
+      "damage_predicted": null,
+      "mana": 0.0,
+      "practice": "1% -> 28%",
+      "use_gain": 1,
+      "fights": "the small troll: fled, the small troll: won",
+      "silent_uses": 0
+     }
+    },
+    "findings": [],
+    "seconds": 185.1,
+    "commit": "7901035a37aac53a105052dbc5d6afbef254cc62",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "knight 5: 2 uses, 2 worked"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.4.branch",
+   "title": "Sim `hunt --minutes 5` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 306 s (fights 12, bot errors 0, crashed False)",
+   "seconds": 307.4,
+   "log": "hunt: Hunt: angry cave beast, 4 bots (306 s, Xania 7901035a37)\n  fights 12, bot errors 0, crashed False\n  result: clean",
+   "data": {
+    "measurements": {
+     "fights": 12,
+     "bot_errors": 0,
+     "crashed": false
+    },
+    "findings": [],
+    "seconds": 306.5,
+    "commit": "7901035a37aac53a105052dbc5d6afbef254cc62",
+    "outcomes": []
+   }
+  },
+  {
+   "key": "before-proof",
+   "title": "Proof the bug was there before the change",
+   "ok": true,
+   "expected": "a new test fails on the base, or a Sim trial shows the bug on the base",
+   "detail": "Sim showed it on the base: Sim `weapon --rounds 40 --expect code today` on the base",
+   "seconds": 0.0,
+   "log": "",
+   "data": {}
+  },
+  {
+   "key": "static",
+   "title": "Builder's detectors on the focus, base against branch",
+   "ok": null,
+   "expected": "no string_view indexed like a C string is left in the focus",
+   "detail": "doesn't apply: the focus has no string_view indexing, before or after",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "function": "damage",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "one_hit",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "char_update",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "spell_vampire",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "update_pos",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "check_damage_tolerance",
+      "base": [],
+      "branch": []
+     }
+    ]
+   }
+  }
+ ],
+ "error": "",
+ "passed": true,
+ "exit_code": 0
+}

@@ -1,0 +1,36 @@
+# What `prototype` runs for #9, beyond format, builds and unit tests (always run).
+base = "eec205e"   # main of the fork and of upstream after #307-#309 merged
+
+[[sim]]
+args = ["smoke"]
+why = "the game still boots and a player can create a character, look and quit"
+branch = "clean"
+
+[[sim]]
+args = ["weapon", "--rounds", "40", "--expect", "code today"]
+why = "a knight wields three vampiric weapons (levels 11, 65, 91) against a 30,000 hp beggar; every round's hp change is accounted for"
+base = "clean"
+base_means = "the old (damage / 100) * 10 explains the rounds best for every weapon: nothing below 100 damage"
+branch = "skip"
+outcomes = "all-ok"
+timeout = 1800
+
+[[sim]]
+args = ["weapon", "--rounds", "40", "--expect", "#9"]
+why = "the same three fights on the fix"
+branch = "clean"
+branch_means = "5% of each hit, rounded, explains the rounds best for every weapon, with a drain message on each draining hit"
+outcomes = "all-ok"
+timeout = 1800
+
+[[sim]]
+args = ["skill", "bash", "--classes", "knight", "--fights", "2"]
+why = "skill attacks such as bash still work (they reach damage() as a skill, which the drain now skips)"
+branch = "clean"
+timeout = 900
+
+[[sim]]
+args = ["hunt", "--minutes", "5"]
+why = "ordinary fights, kills and autoloot still run through damage() without a crash"
+branch = "clean"
+timeout = 900

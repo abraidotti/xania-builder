@@ -1,0 +1,299 @@
+{
+ "schema": 1,
+ "slug": "issue-11-harm-deals-fire-damage-unlike-the",
+ "branch": "fix/11-harm-damage-type",
+ "branch_sha": "58ba177c284bb568428bd44c5fcfe5e258e6ce2a",
+ "base_sha": "eec205e5fdb85c1799f1201d23b0cb8d91ba1b04",
+ "started": 1795231105.841486,
+ "seconds": 257.4,
+ "environment": {
+  "gcc": "g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "os": "Ubuntu 26.04.1 LTS",
+  "distro": "Ubuntu-26.04"
+ },
+ "changes": {
+  "files": [
+   [
+    "M",
+    "src/magic.cpp"
+   ]
+  ],
+  "stat": "1 file changed, 1 insertion(+), 1 deletion(-)",
+  "commits": [
+   "58ba177 spell_harm: deal Harm damage again, like the rest of the Harmful group"
+  ],
+  "new_tests": []
+ },
+ "steps": [
+  {
+   "key": "format",
+   "title": "clang-format (make check-format, as CI)",
+   "ok": true,
+   "expected": "no formatting differences",
+   "detail": "clean",
+   "seconds": 2.3,
+   "log": "~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/.tools/clang-format-14 --dry-run -Werror ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Class.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AreaList.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/entity_balance.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ScrollTargetValidator.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/TimeInfoData.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/update.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Learning.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/WrappedFd.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PracticeTabulator.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Char.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Pronouns.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/VnumMobiles.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Shop.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Types.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_obj.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ObjectIndex.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/magic.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProgLoader.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AFFECT_DATA.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/channels.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SkillTables.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Constants.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DescriptorFilter.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/fight.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Help.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ScrollTargetValidator.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DamageMessages.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ObjectType.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Stats.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Finger.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PcCustomization.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SkillsTabulator.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PerEnum.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Stats.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CommandSet.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SectorType.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/string_utils.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Weapon.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/merc.h ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Socials.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Alignment.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/InterpreterImpl.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CharActFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/spec_concordius.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AreaList.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Titles.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/magic2.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/Fd.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/mask_hostname.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/Time.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/Fd.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/BitOps.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/StandardBits.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/Configuration.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/Byte.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/test/ConfigurationTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/test/TimeTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/test/mask_hostname_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/test/main.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/mask_hostname.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/doorman_protocol.h ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/common/Configuration.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Dice.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Visitor.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/handler.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProgImpl.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Channel.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Doorman.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Channel.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/TelnetProtocol.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/test/TelnetProtocolTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/test/IdAllocatorTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/test/main.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Logger.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Doorman.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/TelnetProtocol.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Xania.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Logger.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/Xania.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/IdAllocator.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/IdAllocator.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/doorman/main.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ClanCommFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/clan.h ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Attacks.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Learning.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/lookup.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ArgParser.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/update.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ObjectType.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Worn.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PlayerActFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Finger.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Weapon.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Rng.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/RoomFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/phil.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MobTrig.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/BodyPartFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ResetData.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Direction.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MudImpl.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DamageMessages.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AffectList.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Pronouns.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/InjuredPart.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Note.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MobIndexData.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_move.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/FlagFormat.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_info.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Char.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_info.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/skills.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ExitFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_comm.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Ban.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProg.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Ban.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ride.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/TimeInfoData.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DamageContext.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/db.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AffectList.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Object.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProg.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MobIndexData.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CorpseSummoner.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AFFECT_DATA.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/save.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/BodySize.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Lights.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/skills.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Sex.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/save.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DescriptorList.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Materials.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Duel.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Flag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Area.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PromptFormat.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PromptFormat.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ride.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MudImpl.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SpellTarget.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Sex.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/BodySize.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CorpseSummoner.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/VnumObjects.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Position.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/string_utils_impl.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ArmourClass.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Races.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Class.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Descriptor.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PcNutrition.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MorphologyFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ArgParser.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Descriptor.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/apps/map.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/apps/pfu.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/apps/pfu.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/apps/areas.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/apps/test/pfutest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/apps/test/main.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/apps/pfumain.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/wiznet.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SkillTables.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AffectLocation.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Room.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Act.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Logging.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Direction.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Note.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProgTriggerCtx.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/act_obj_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/CharTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/PracticeTabulatorTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/MProgImplTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/PromptFormatTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/fileutils.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/BodySizeTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/TitlesTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/HelpTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/magic_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/GetTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/WeaponTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/DescriptorTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/PositionTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/DuelTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/ScrollTargetValidatorTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/LoggingTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/FlagTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/SkillsTabulatorTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/CatchFormatters.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/ClassTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/db_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/ExtractCharTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/ObjectTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/AffectListTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/AreaTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/MemFile.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/WearTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/BansTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/TimeInfoDataTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/PronounsTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/HitChanceTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/AFFECT_DATATest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/MockMud.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/DamageMessagesTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/LearningTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/AttacksTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/SectorTypeTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/MaterialsTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/InjuredPartTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/lookup_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/DamageToleranceTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/CommandSetTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/PcNutritionTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/nth_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/MProgLoaderTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/InterpreterImplTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/save_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/DiceTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/MobIndexDataTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/string_utils_test.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/SexTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/MockRng.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/WeatherDataTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/NoteTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/ObjectTypeTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/CorpseSummonerTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/SocialsTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/ArgParserTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/TipsTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/main.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/test/GenericListTest.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ObjectIndex.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ObjectExtraFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ObjectIndexValidator.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/mob_commands.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Tips.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/VnumRooms.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SkillsTabulator.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Races.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/OffensiveFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SkillNumbers.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PracticeTabulator.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Materials.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/HitChance.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/nth.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Logging.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/AffectFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/fight.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Position.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/WeatherData.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Flag.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ExtraDescription.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/clan.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/HitChance.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CommFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Interpreter.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/db.h ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PcData.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/InjuredPart.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Columner.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Attacks.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Tip.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/InterpreterImpl.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/nth.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Dice.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Object.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ContainerFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/WeatherData.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Rng.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_obj.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/PcNutrition.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/string_utils.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Titles.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/healer.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DamageType.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Mud.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DamageTolerance.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_comm.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProgProgram.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_wiz.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DescriptorList.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Socials.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Tips.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_move.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProgImpl.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Format.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/lookup.h ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Tip.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Room.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/special.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProgTypeFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Exit.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Target.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CharExtraFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CharVersion.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/MProgLoader.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Act.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/magic.h ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/SectorType.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/GenericList.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Area.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/handler.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/WeaponFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/act_wiz.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/main.cpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ObjectWearFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Help.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/DamageTolerance.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/Duel.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/WrappedFd.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/ToleranceFlag.hpp ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/src/CharFileMeta.hpp",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "build.branch.debug",
+   "title": "Debug build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 0.4,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/cmake-build-debug\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.debug",
+   "title": "Unit tests, Debug, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1090 test cases and sections, all passed",
+   "seconds": 4.2,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.23 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   2.34 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1090,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.branch.release",
+   "title": "Release build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 0.2,
+   "log": "/usr/bin/cmake --build ~/xania-gate/issue-11-harm-deals-fire-damage-unlike-the/branch/cmake-build-release\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.release",
+   "title": "Unit tests, Release, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1090 test cases and sections, all passed",
+   "seconds": 0.4,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.02 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   0.15 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1090,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.debug",
+   "title": "Debug build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 0.3,
+   "log": "/usr/bin/cmake --build ~/xania-gate/_base-eec205e5fdb8/cmake-build-debug\nninja: no work to do.",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.debug",
+   "title": "Unit tests, Debug, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "0 of 1090 failed",
+   "seconds": 2.3,
+   "log": "",
+   "data": {
+    "exit": 0,
+    "cases": 1090,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.release",
+   "title": "Release build of the base with the branch's tests",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "up to date (nothing to rebuild)",
+   "seconds": 1.6,
+   "log": "    target_link_libraries(... Catch2::Catch2WithMain Microsoft.GSL::GSL trompeloeil::trompeloeil spdlog::spdlog fmt::fmt date::date range-v3::range-v3 bfg::lyra magic_enum::magic_enum)\nGenerating aggregated env files\nGenerated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\nInstall finished successfully\n-- CMake-Conan: CONAN_GENERATORS_FOLDER=~/xania-gate/_base-eec205e5fdb8/cmake-build-release/conan\n-- CMake-Conan: CONANFILE=~/xania-gate/_base-eec205e5fdb8/conanfile.txt\n-- Conan: Component target declared 'spdlog::spdlog'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opens50b520e94960d/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (1.3s)\n-- Generating done (0.1s)\n-- Build files have been written to: ~/xania-gate/_base-eec205e5fdb8/cmake-build-release",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.base.release",
+   "title": "Unit tests, Release, the base with the branch's tests",
+   "ok": null,
+   "expected": "the new tests fail here (they pin the bug)",
+   "detail": "0 of 1090 failed",
+   "seconds": 0.2,
+   "log": "",
+   "data": {
+    "exit": 0,
+    "cases": 1090,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "sim.0.branch",
+   "title": "Sim `smoke` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 22 s",
+   "seconds": 22.4,
+   "log": "smoke: Smoke: create a bot, look, quit (22 s, Xania 58ba177c28)\n  transcript: runs\\20261120-221855\\Smokea.log\n  result: clean",
+   "data": {
+    "measurements": {},
+    "findings": [],
+    "seconds": 21.7,
+    "commit": "58ba177c284bb568428bd44c5fcfe5e258e6ce2a",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "Smokea created"
+     },
+     {
+      "ok": true,
+      "summary": "looked around"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.1.base",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k harm_deals_fire` on the base",
+   "ok": true,
+   "expected": "harm hurts the Magic-immune snotling with a fire verb and can't touch the Fire-immune bat: the opposite of cause critical",
+   "detail": "pytest exit 0: 1 passed, 6 deselected in 41.59s",
+   "seconds": 42.5,
+   "log": ".                                                                        [100%]\n1 passed, 6 deselected in 41.59s",
+   "data": {}
+  },
+  {
+   "key": "sim.1.branch",
+   "title": "Sim `pytest scenarios/test_live_bugs.py -k harm_deals_fire` on the branch",
+   "ok": true,
+   "expected": "harm behaves like cause critical: the snotling is unaffected (Magic immunity), so the known-bug check reports the bug gone",
+   "detail": "pytest exit 1: 1 failed, 6 deselected in 42.03s",
+   "seconds": 42.8,
+   "log": "                    seen[mob, spell] = await _cast(bot, spell, mob)\n                    await d.peace()\n                    await d.do(f\"purge {mob}\", expect=None)\n        finally:\n            try:\n                await d.peace()\n                await d.restore(bot.name)\n            finally:\n                await d.close()\n        await bot.close()\n        assert not any(v.startswith(\"??\") for v in seen.values()), f\"a cast neither hit nor was shrugged off, so the \" \\\n                                                                   f\"check didn't run: {seen}\"\n        # the control: Harm damage checks Magic\n        assert seen[\"snotling\", \"cause critical\"] == \"unaffected\", seen\n        assert seen[\"bat\", \"cause critical\"] != \"unaffected\", seen\n        # harm: Fire damage checks Fire\n>       assert seen[\"snotling\", \"harm\"] != \"unaffected\", (\n            f\"harm can't hurt a Magic-immune mob any more: it deals Harm damage again (abraidotti/xania#11 option A), \"\n            f\"retire this test. {seen}\")\nE       AssertionError: harm can't hurt a Magic-immune mob any more: it deals Harm damage again (abraidotti/xania#11 option A), retire this test. {('snotling', 'harm'): 'unaffected', ('snotling', 'cause critical'): 'unaffected', ('bat', 'harm'): 'UNSPEAKABLE', ('bat', 'cause critical'): 'MASSACRES'}\nE       assert 'unaffected' != 'unaffected'\nscenarios\\test_live_bugs.py:273: AssertionError\n=========================== short test summary info ===========================\nFAILED scenarios/test_live_bugs.py::test_harm_deals_fire_damage_not_harm - As...\n1 failed, 6 deselected in 42.03s",
+   "data": {}
+  },
+  {
+   "key": "sim.2.branch",
+   "title": "Sim `skill harm --classes cleric --fights 2` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 126 s (skill harm, kind spell, learned by cleric 23)",
+   "seconds": 127.1,
+   "log": "[00:00] skill trial: planned (skill=harm kind=spell classes=cleric 23)\n[01:28] skill cleric 23: staged (ok=True)\n[01:28] skill cleric 23: practising\n[01:40] skill cleric 23: using (practice=1->75)\n[02:03] skill cleric 23: done (uses=4 worked=4 fights=the escaped prisoner: fled, the escaped prisoner: fled)\nskill: Skill: harm (126 s, Xania 58ba177c28)\n  skill harm, kind spell, learned by cleric 23\n  xania_log: runs\\skill-20261120-222028\\xania.log\n  transcripts: runs\\skill-20261120-222028\n  result: clean",
+   "data": {
+    "measurements": {
+     "skill": "harm",
+     "kind": "spell",
+     "learned_by": "cleric 23",
+     "cleric 23": {
+      "level": 23,
+      "uses": 4,
+      "success_rate": 1.0,
+      "damage_seen": 66.8,
+      "damage_per_attempt_seen": 66.8,
+      "damage_predicted": 48.2,
+      "mana": 46.2,
+      "practice": "1% -> 75%",
+      "use_gain": 1,
+      "fights": "the escaped prisoner: fled, the escaped prisoner: fled",
+      "silent_uses": 0
+     }
+    },
+    "findings": [],
+    "seconds": 126.2,
+    "commit": "58ba177c284bb568428bd44c5fcfe5e258e6ce2a",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "cleric 23: 4 uses, 4 worked"
+     }
+    ]
+   }
+  },
+  {
+   "key": "before-proof",
+   "title": "Proof the bug was there before the change",
+   "ok": true,
+   "expected": "a new test fails on the base, or a Sim trial shows the bug on the base",
+   "detail": "Sim showed it on the base: Sim `pytest scenarios/test_live_bugs.py -k harm_deals_fire` on the base",
+   "seconds": 0.0,
+   "log": "",
+   "data": {}
+  },
+  {
+   "key": "static",
+   "title": "Builder's detectors on the focus, base against branch",
+   "ok": null,
+   "expected": "no string_view indexed like a C string is left in the focus",
+   "detail": "doesn't apply: the focus has no string_view indexing, before or after",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "function": "spell_harm",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "check_damage_tolerance",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "damage",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "spell_cause_light",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "MobIndexData::MobIndexData",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "spell_fireball",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "spec_cast_cleric",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "is_safe",
+      "base": [],
+      "branch": []
+     }
+    ]
+   }
+  }
+ ],
+ "error": "",
+ "passed": true,
+ "exit_code": 0
+}
