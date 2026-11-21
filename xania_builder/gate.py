@@ -229,7 +229,9 @@ mkdir -p "$W"
 [ -d "$B" ] || git -C "$R" worktree add -q --detach "$B" {base_sha}
 cd "$W/branch" && git checkout -q -f --detach {branch_sha} && git clean -qfd src
 cd "$B" && git checkout -q -f --detach {base_sha} && git clean -qfd src
-git apply {shlex.quote(wsl_path(work / 'tests.patch'))} 2>&1 || {{ echo "tests.patch doesn't apply to the base"; exit 3; }}
+if [ -s {shlex.quote(wsl_path(work / 'tests.patch'))} ]; then  # empty when the change adds no tests
+  git apply {shlex.quote(wsl_path(work / 'tests.patch'))} 2>&1 || {{ echo "tests.patch doesn't apply to the base"; exit 3; }}
+fi
 echo "gcc: $(g++-15 --version 2>/dev/null | head -1 || g++ --version | head -1)"
 echo "cmake: $(cmake --version | head -1)"
 echo "os: $(. /etc/os-release; echo $PRETTY_NAME)"

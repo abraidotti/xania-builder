@@ -109,7 +109,9 @@ def gate_tables(g: dict, head: str = "") -> str:
 
 
 def body(folder: Path, g: dict, target: str, issue_ref: str, fork: str, upstream: str = "mattgodbolt/xania",
-         head: str = "") -> str:
+         head: str = "", closes_upstream: int | None = None) -> str:
+    """closes_upstream: an upstream issue the change resolves, for a dossier with no fork issue (gate.toml's
+    ``closes = "upstream #N"``); the fork PR mentions it, and the upstream PR closes it."""
     a = (folder / "analysis.md").read_text(encoding="utf-8")
     sec = sections(a)
     lead = a.split("## In one paragraph", 1)[1].split("\n## ", 1)[0].strip() if "## In one paragraph" in a else ""
@@ -122,7 +124,10 @@ def body(folder: Path, g: dict, target: str, issue_ref: str, fork: str, upstream
     why = sec.get("Why debug builds abort and release builds don't", "")
     page = f"{PAGES_URL}/dossiers/{folder.name}/"
     n = re.sub(r"\D", "", issue_ref)
-    closes = f"Fixes #{n}." if target == "fork" else f"Reported as {fork}#{n} (with the reproduction)."
+    if closes_upstream:
+        closes = (f"For upstream #{closes_upstream}." if target == "fork" else f"Closes upstream #{closes_upstream}.")
+    else:
+        closes = f"Fixes #{n}." if target == "fork" else f"Reported as {fork}#{n} (with the reproduction)."
     parts = [lead, "", closes, "",
              "## What was wrong", "", _first_table(root)]
     if why:
@@ -185,7 +190,9 @@ def ship(cfg, folder: Path, target: str = "fork", draft: bool = False, dry_run: 
                                         f"{g['base_sha']}..{head}"]).splitlines()[0]
     if target == "upstream":
         title = re.sub(r"\s*\(#\d+\)$", "", title)  # "#1" in a title on upstream would mean upstream's #1
-    text = body(folder, g, target, d["idea"].get("ref", ""), cfg.fork, cfg.upstream, head)
+    up = re.fullmatch(r"upstream #(\d+)", plan.get("closes", "").strip())
+    text = body(folder, g, target, d["idea"].get("ref", ""), cfg.fork, cfg.upstream, head,
+                int(up.group(1)) if up else None)
     (folder / ("pr.md" if target == "fork" else "pr-upstream.md")).write_text(text, encoding="utf-8")
     result = {"title": title, "target": target, "body": str(folder / "pr.md")}
     if dry_run:
