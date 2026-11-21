@@ -1,0 +1,281 @@
+{
+ "schema": 1,
+ "slug": "compare-counts-only-weapon-dice-and",
+ "branch": "feature/144-compare-stats",
+ "branch_sha": "2702f047c5c3927e1a646d0b4a7429ce6399da09",
+ "base_sha": "eec205e5fdb85c1799f1201d23b0cb8d91ba1b04",
+ "started": 1795231907.3648672,
+ "seconds": 121.8,
+ "environment": {
+  "gcc": "g++-15 (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "os": "Ubuntu 26.04.1 LTS",
+  "distro": "Ubuntu-26.04"
+ },
+ "changes": {
+  "files": [
+   [
+    "M",
+    "area/Help.are"
+   ],
+   [
+    "A",
+    "src/ObjectComparison.cpp"
+   ],
+   [
+    "A",
+    "src/ObjectComparison.hpp"
+   ],
+   [
+    "M",
+    "src/act_info.cpp"
+   ],
+   [
+    "A",
+    "src/test/ObjectComparisonTest.cpp"
+   ]
+  ],
+  "stat": "5 files changed, 346 insertions(+), 39 deletions(-)",
+  "commits": [
+   "2702f04 compare: count damroll and AC affects, and say how the other stats differ"
+  ],
+  "new_tests": [
+   "compare weapons",
+   "compare armor",
+   "compare things worn in the same place",
+   "a weapon and something else can't be compared"
+  ]
+ },
+ "steps": [
+  {
+   "key": "format",
+   "title": "clang-format (make check-format, as CI)",
+   "ok": true,
+   "expected": "no formatting differences",
+   "detail": "clean",
+   "seconds": 2.3,
+   "log": "~/xania-gate/compare-counts-only-weapon-dice-and/branch/.tools/clang-format-14 --dry-run -Werror ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Class.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AreaList.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/entity_balance.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ScrollTargetValidator.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/TimeInfoData.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/update.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Learning.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/WrappedFd.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PracticeTabulator.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Char.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Pronouns.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/VnumMobiles.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Shop.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Types.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_obj.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectIndex.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/magic.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProgLoader.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AFFECT_DATA.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/channels.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SkillTables.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Constants.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DescriptorFilter.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/fight.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Help.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ScrollTargetValidator.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DamageMessages.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectType.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Stats.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Finger.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PcCustomization.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SkillsTabulator.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PerEnum.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Stats.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CommandSet.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SectorType.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/string_utils.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Weapon.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/merc.h ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Socials.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Alignment.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/InterpreterImpl.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CharActFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/spec_concordius.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AreaList.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Titles.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/magic2.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/Fd.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/mask_hostname.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/Time.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/Fd.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/BitOps.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/StandardBits.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/Configuration.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/Byte.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/test/ConfigurationTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/test/TimeTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/test/mask_hostname_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/test/main.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/mask_hostname.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/doorman_protocol.h ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/common/Configuration.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Dice.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Visitor.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/handler.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProgImpl.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Channel.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Doorman.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Channel.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/TelnetProtocol.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/test/TelnetProtocolTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/test/IdAllocatorTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/test/main.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Logger.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Doorman.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/TelnetProtocol.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Xania.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Logger.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/Xania.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/IdAllocator.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/IdAllocator.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/doorman/main.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ClanCommFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/clan.h ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Attacks.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Learning.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/lookup.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ArgParser.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/update.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectType.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Worn.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PlayerActFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Finger.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Weapon.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Rng.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/RoomFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/phil.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MobTrig.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/BodyPartFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ResetData.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Direction.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MudImpl.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DamageMessages.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AffectList.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Pronouns.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/InjuredPart.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Note.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MobIndexData.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_move.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/FlagFormat.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_info.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Char.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_info.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/skills.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ExitFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_comm.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Ban.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProg.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Ban.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ride.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/TimeInfoData.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DamageContext.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/db.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AffectList.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Object.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProg.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MobIndexData.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CorpseSummoner.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AFFECT_DATA.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/save.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/BodySize.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Lights.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/skills.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Sex.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/save.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DescriptorList.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Materials.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Duel.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectComparison.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Flag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Area.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PromptFormat.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PromptFormat.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ride.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MudImpl.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SpellTarget.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Sex.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/BodySize.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CorpseSummoner.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/VnumObjects.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Position.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/string_utils_impl.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ArmourClass.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Races.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Class.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Descriptor.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PcNutrition.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MorphologyFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ArgParser.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Descriptor.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/apps/map.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/apps/pfu.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/apps/pfu.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/apps/areas.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/apps/test/pfutest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/apps/test/main.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/apps/pfumain.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/wiznet.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SkillTables.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AffectLocation.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Room.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Act.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Logging.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Direction.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Note.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProgTriggerCtx.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/act_obj_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/CharTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/PracticeTabulatorTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/MProgImplTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/PromptFormatTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/fileutils.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/BodySizeTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/TitlesTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/HelpTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/magic_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/GetTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/WeaponTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/DescriptorTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/PositionTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/DuelTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/ScrollTargetValidatorTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/LoggingTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/FlagTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/SkillsTabulatorTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/CatchFormatters.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/ClassTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/db_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/ExtractCharTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/ObjectTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/AffectListTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/AreaTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/MemFile.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/WearTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/BansTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/TimeInfoDataTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/PronounsTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/HitChanceTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/AFFECT_DATATest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/MockMud.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/ObjectComparisonTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/DamageMessagesTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/LearningTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/AttacksTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/SectorTypeTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/MaterialsTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/InjuredPartTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/lookup_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/DamageToleranceTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/CommandSetTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/PcNutritionTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/nth_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/MProgLoaderTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/InterpreterImplTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/save_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/DiceTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/MobIndexDataTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/string_utils_test.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/SexTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/MockRng.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/WeatherDataTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/NoteTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/ObjectTypeTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/CorpseSummonerTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/SocialsTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/ArgParserTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/TipsTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/main.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/test/GenericListTest.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectIndex.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectExtraFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectIndexValidator.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/mob_commands.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Tips.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/VnumRooms.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SkillsTabulator.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Races.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/OffensiveFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SkillNumbers.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PracticeTabulator.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Materials.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/HitChance.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/nth.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Logging.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/AffectFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/fight.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Position.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/WeatherData.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Flag.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ExtraDescription.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/clan.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/HitChance.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CommFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Interpreter.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/db.h ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PcData.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/InjuredPart.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Columner.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Attacks.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Tip.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/InterpreterImpl.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/nth.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Dice.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Object.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ContainerFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/WeatherData.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Rng.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_obj.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/PcNutrition.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/string_utils.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Titles.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/healer.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DamageType.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Mud.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DamageTolerance.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_comm.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProgProgram.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_wiz.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DescriptorList.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Socials.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Tips.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_move.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProgImpl.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Format.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/lookup.h ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Tip.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Room.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/special.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProgTypeFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Exit.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Target.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CharExtraFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CharVersion.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/MProgLoader.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Act.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/magic.h ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/SectorType.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/GenericList.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Area.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/handler.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectComparison.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/WeaponFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/act_wiz.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/main.cpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ObjectWearFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Help.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/DamageTolerance.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/Duel.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/WrappedFd.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/ToleranceFlag.hpp ~/xania-gate/compare-counts-only-weapon-dice-and/branch/src/CharFileMeta.hpp",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "build.branch.debug",
+   "title": "Debug build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 10 s",
+   "seconds": 9.5,
+   "log": "/usr/bin/cmake --build ~/xania-gate/compare-counts-only-weapon-dice-and/branch/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.debug",
+   "title": "Unit tests, Debug, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1107 test cases and sections, all passed",
+   "seconds": 4.2,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.22 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   2.16 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1107,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.branch.release",
+   "title": "Release build of the branch",
+   "ok": true,
+   "expected": "it compiles (-Werror)",
+   "detail": "built in 7 s",
+   "seconds": 6.7,
+   "log": "/usr/bin/cmake --build ~/xania-gate/compare-counts-only-weapon-dice-and/branch/cmake-build-release",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "unit.branch.release",
+   "title": "Unit tests, Release, the branch",
+   "ok": true,
+   "expected": "every test passes",
+   "detail": "1107 test cases and sections, all passed",
+   "seconds": 0.3,
+   "log": "4/4 Test #4: apps_test ........................   Passed    0.02 sec\n100% tests passed, 0 tests failed out of 4\nTotal Test time (real) =   0.10 sec",
+   "data": {
+    "exit": 0,
+    "cases": 1107,
+    "failed": [],
+    "aborted": false
+   }
+  },
+  {
+   "key": "build.base.debug",
+   "title": "Debug build of the base with the branch's tests",
+   "ok": null,
+   "expected": "it compiles (-Werror)",
+   "detail": "the new tests use code the change adds, so they can't compile without it; Sim's trials on the base are the before/after proof",
+   "seconds": 2.0,
+   "log": "-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opensb2a02fcf50b86/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (1.6s)\n-- Generating done (0.1s)\n-- Build files have been written to: ~/xania-gate/_base-eec205e5fdb8/cmake-build-debug\nFAILED: [code=1] src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi \n/usr/bin/g++-15 -DCATCH_CONFIG_ENABLE_ALL_STRINGMAKERS -DCATCH_CONFIG_EXTERNAL_INTERFACES -DCURL_STATICLIB=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DTEST_DATA_DIR=\\\"~/xania-gate/_base-eec205e5fdb8/src/test/test_data\\\" -I~/xania-gate/_base-eec205e5fdb8/src/common/.. -isystem ~/.conan2/p/ms-gs0dca0ad769720/p/include -isystem ~/.conan2/p/b/dateb908529e1afd1/p/include -isystem ~/.conan2/p/b/fmtb0dcc6566c971/p/include -isystem ~/.conan2/p/range0301bf3d76d5d/p/include -isystem ~/.conan2/p/b/spdlo4ad83b33f87a9/p/include -isystem ~/.conan2/p/magic063a607ca5409/p/include -isystem ~/.conan2/p/b/catch6033a2d777cd4/p/include -isystem ~/.conan2/p/tromp61e1d5cd3f939/p/include -g -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address -fsanitize=undefined  -std=gnu++20 -Werror -Wall -Wextra -g -E -x c++ ~/xania-gate/_base-eec205e5fdb8/src/test/ObjectComparisonTest.cpp -MT src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi -MD -MF src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi.d -fmodules-ts -fdeps-file=src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi -fdeps-target=src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o -fdeps-format=p1689r5 -o src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi.i\n~/xania-gate/_base-eec205e5fdb8/src/test/ObjectComparisonTest.cpp:6:10: fatal error: ObjectComparison.hpp: No such file or directory\n    6 | #include \"ObjectComparison.hpp\"\n      |          ^~~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\nninja: build stopped: subcommand failed.\nmake: *** [Makefile:46: build] Error 1",
+   "data": {
+    "exit": 2,
+    "needs_change": true
+   }
+  },
+  {
+   "key": "build.base.release",
+   "title": "Release build of the base with the branch's tests",
+   "ok": null,
+   "expected": "it compiles (-Werror)",
+   "detail": "the new tests use code the change adds, so they can't compile without it; Sim's trials on the base are the before/after proof",
+   "seconds": 0.3,
+   "log": "/usr/bin/cmake --build ~/xania-gate/_base-eec205e5fdb8/cmake-build-release\nFAILED: [code=1] src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi \n/usr/bin/g++-15 -DCATCH_CONFIG_ENABLE_ALL_STRINGMAKERS -DCATCH_CONFIG_EXTERNAL_INTERFACES -DCURL_STATICLIB=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DTEST_DATA_DIR=\\\"~/xania-gate/_base-eec205e5fdb8/src/test/test_data\\\" -I~/xania-gate/_base-eec205e5fdb8/src/common/.. -isystem ~/.conan2/p/ms-gs0dca0ad769720/p/include -isystem ~/.conan2/p/b/date6715ef15e84c6/p/include -isystem ~/.conan2/p/b/fmt3df35e0a5dd70/p/include -isystem ~/.conan2/p/range0301bf3d76d5d/p/include -isystem ~/.conan2/p/b/spdlofbc5494bb83cc/p/include -isystem ~/.conan2/p/magic063a607ca5409/p/include -isystem ~/.conan2/p/b/catch7924f1ac3297a/p/include -isystem ~/.conan2/p/tromp61e1d5cd3f939/p/include -O2 -DNDEBUG -Wno-error=array-bounds -std=gnu++20 -Werror -Wall -Wextra -g -E -x c++ ~/xania-gate/_base-eec205e5fdb8/src/test/ObjectComparisonTest.cpp -MT src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi -MD -MF src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi.d -fmodules-ts -fdeps-file=src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi -fdeps-target=src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o -fdeps-format=p1689r5 -o src/test/CMakeFiles/xania_test.dir/ObjectComparisonTest.cpp.o.ddi.i\n~/xania-gate/_base-eec205e5fdb8/src/test/ObjectComparisonTest.cpp:6:10: fatal error: ObjectComparison.hpp: No such file or directory\n    6 | #include \"ObjectComparison.hpp\"\n      |          ^~~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\nninja: build stopped: subcommand failed.\nmake: *** [Makefile:46: build] Error 1",
+   "data": {
+    "exit": 2,
+    "needs_change": true
+   }
+  },
+  {
+   "key": "build.base-for-sim",
+   "title": "Debug build of the base as it is (for Sim's trials on it)",
+   "ok": true,
+   "expected": "it compiles and installs",
+   "detail": "built in 2 s",
+   "seconds": 1.6,
+   "log": "    target_link_libraries(... Catch2::Catch2WithMain Microsoft.GSL::GSL trompeloeil::trompeloeil spdlog::spdlog fmt::fmt date::date range-v3::range-v3 bfg::lyra magic_enum::magic_enum)\nGenerating aggregated env files\nGenerated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\nInstall finished successfully\n-- CMake-Conan: CONAN_GENERATORS_FOLDER=~/xania-gate/_base-eec205e5fdb8/cmake-build-debug/conan\n-- CMake-Conan: CONANFILE=~/xania-gate/_base-eec205e5fdb8/conanfile.txt\n-- Conan: Component target declared 'spdlog::spdlog'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- Conan: Component target declared 'fmt::fmt'\n-- CMake-Conan: find_package(fmt) found, 'conan install' already ran\n-- CMake-Conan: find_package(range-v3) found, 'conan install' already ran\n-- Conan: Component target declared 'range-v3::range-v3-meta'\n-- Conan: Component target declared 'range-v3::range-v3-concepts'\n-- Conan: Target declared 'range-v3::range-v3'\n-- CMake-Conan: find_package(magic_enum) found, 'conan install' already ran\n-- Conan: Target declared 'magic_enum::magic_enum'\n-- CMake-Conan: find_package(date) found, 'conan install' already ran\n-- Conan: Component target declared 'date::date-tz'\n-- Conan: Target declared 'date::date'\n-- CMake-Conan: find_package(CURL) found, 'conan install' already ran\n-- Conan: Component target declared 'CURL::libcurl'\n-- CMake-Conan: find_package(OpenSSL) found, 'conan install' already ran\n-- Conan: Component target declared 'OpenSSL::Crypto'\n-- Conan: Component target declared 'OpenSSL::SSL'\n-- Conan: Target declared 'openssl::openssl'\n-- CMake-Conan: find_package(ZLIB) found, 'conan install' already ran\n-- Conan: Target declared 'ZLIB::ZLIB'\n-- Conan: Including build module from '~/.conan2/p/b/opensb2a02fcf50b86/p/lib/cmake/conan-official-openssl-variables.cmake'\n-- CMake-Conan: find_package(Microsoft.GSL) found, 'conan install' already ran\n-- Conan: Component target declared 'Microsoft.GSL::GSL'\n-- CMake-Conan: find_package(Catch2) found, 'conan install' already ran\n-- Conan: Component target declared 'Catch2::Catch2'\n-- Conan: Component target declared 'Catch2::Catch2WithMain'\n-- CMake-Conan: find_package(trompeloeil) found, 'conan install' already ran\n-- Conan: Target declared 'trompeloeil::trompeloeil'\n-- CMake-Conan: find_package(lyra) found, 'conan install' already ran\n-- Conan: Component target declared 'bfg::lyra'\n-- Configuring done (1.2s)\n-- Generating done (0.0s)\n-- Build files have been written to: ~/xania-gate/_base-eec205e5fdb8/cmake-build-debug",
+   "data": {
+    "exit": 0
+   }
+  },
+  {
+   "key": "before-after",
+   "title": "The new tests, before and after the change",
+   "ok": null,
+   "expected": "each new test fails or aborts on the base in at least one build, and passes on the branch",
+   "detail": "the new tests pass on the branch; they can't build on the base (they test code the change adds), so the base side is Sim's",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "case": "compare weapons",
+      "base.debug": "not run",
+      "base.release": "not run",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "can't build before the change"
+     },
+     {
+      "case": "compare armor",
+      "base.debug": "not run",
+      "base.release": "not run",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "can't build before the change"
+     },
+     {
+      "case": "compare things worn in the same place",
+      "base.debug": "not run",
+      "base.release": "not run",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "can't build before the change"
+     },
+     {
+      "case": "a weapon and something else can't be compared",
+      "base.debug": "not run",
+      "base.release": "not run",
+      "branch.debug": "pass",
+      "branch.release": "pass",
+      "verdict": "can't build before the change"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.0.branch",
+   "title": "Sim `smoke` on the branch",
+   "ok": true,
+   "expected": "it runs and finds no crash",
+   "detail": "no crash in 22 s",
+   "seconds": 22.4,
+   "log": "smoke: Smoke: create a bot, look, quit (22 s, Xania 2702f047c5)\n  transcript: runs\\20261120-223232\\Smokea.log\n  result: clean",
+   "data": {
+    "measurements": {},
+    "findings": [],
+    "seconds": 21.6,
+    "commit": "2702f047c5c3927e1a646d0b4a7429ce6399da09",
+    "outcomes": [
+     {
+      "ok": true,
+      "summary": "Smokea created"
+     },
+     {
+      "ok": true,
+      "summary": "looked around"
+     }
+    ]
+   }
+  },
+  {
+   "key": "sim.1.base",
+   "title": "Sim `pytest scenarios/test_live_compare.py` on the base",
+   "ok": true,
+   "expected": "compare says the pin looks worse than the dagger, and can't compare the two rings",
+   "detail": "pytest exit 1: 1 failed in 33.41s",
+   "seconds": 34.2,
+   "log": "E         \nE         Directrix has created a pink ice ring!\nE         \nE         \nE         \nE         Directrix gives you a pink ice ring.\nE         Concordius raises an eyebrow at Directrix's weird actions.\nE         \nE         \nE         \nE         Directrix has created something!\nE         \nE         \nE         \nE         Directrix gives you a very sharp pin.\nE         \nE         \nE         A very sharp pin looks worse than a long elven dagger.\nE         \nE         \nE       assert 'A very sharp pin looks better than a long elven dagger.' in ' south up]\\nDirectrix the Apprentice of Magic is here.\\nA tamed eagle perches on a wall.\\n(White Aura) Concordius sta...omething!\\n\\n\\n\\nDirectrix gives you a very sharp pin.\\n\\n\\nA very sharp pin looks worse than a long elven dagger.\\n\\n'\nscenarios\\test_live_compare.py:42: AssertionError\n=========================== short test summary info ===========================\nFAILED scenarios/test_live_compare.py::test_compare_counts_bonuses_and_names_the_stats_that_differ\n1 failed in 33.41s",
+   "data": {}
+  },
+  {
+   "key": "sim.1.branch",
+   "title": "Sim `pytest scenarios/test_live_compare.py` on the branch",
+   "ok": true,
+   "expected": "the pin looks better (its damroll counts), with the strength and hp lines; the rings get their four stat lines",
+   "detail": "pytest exit 0: 1 passed in 32.75s",
+   "seconds": 33.5,
+   "log": ".                                                                        [100%]\n1 passed in 32.75s",
+   "data": {}
+  },
+  {
+   "key": "before-proof",
+   "title": "Proof the bug was there before the change",
+   "ok": true,
+   "expected": "a new test fails on the base, or a Sim trial shows the bug on the base",
+   "detail": "Sim showed it on the base: Sim `pytest scenarios/test_live_compare.py` on the base",
+   "seconds": 0.0,
+   "log": "",
+   "data": {}
+  },
+  {
+   "key": "static",
+   "title": "Builder's detectors on the focus, base against branch",
+   "ok": null,
+   "expected": "no string_view indexed like a C string is left in the focus",
+   "detail": "doesn't apply: the focus has no string_view indexing, before or after",
+   "seconds": 0.0,
+   "log": "",
+   "data": {
+    "table": [
+     {
+      "function": "do_compare",
+      "base": [],
+      "branch": []
+     },
+     {
+      "function": "find_comparable",
+      "base": [],
+      "branch": []
+     }
+    ]
+   }
+  }
+ ],
+ "error": "",
+ "passed": true,
+ "exit_code": 0
+}

@@ -1,0 +1,17 @@
+# What `prototype` runs for upstream #144, beyond format, builds and unit tests (always run).
+base = "eec205e"   # main of the fork and of upstream after #307-#309 merged
+closes = "upstream #144"
+title = "compare: count damroll and AC affects, and say how the other stats differ"
+
+[[sim]]
+args = ["smoke"]
+why = "the game still boots and a player can create a character, look and quit"
+branch = "clean"
+
+[[sim]]
+args = ["pytest", "scenarios/test_live_compare.py"]
+why = "a new character is given #144's four example items and types `compare pin elven` and `compare protection pink`"
+base = "fail"
+base_means = "compare says the pin looks worse than the dagger, and can't compare the two rings"
+branch = "pass"
+branch_means = "the pin looks better (its damroll counts), with the strength and hp lines; the rings get their four stat lines"
